@@ -4,6 +4,14 @@ import { ref } from 'vue'
 defineProps<{ msg: string }>()
 
 const count = ref(0)
+import {PawnSet} from '../models/PawnSet.ts'
+
+
+  const pawnSet = new PawnSet();
+
+  pawnSet.init()
+  pawnSet.availableMoves(pawnSet.allPawns[1])
+  
 </script>
 
 <template>
