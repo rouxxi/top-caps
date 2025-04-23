@@ -1,9 +1,3 @@
-let defaultGrid : Array<[number, number]> = []
+import { GridGenerator } from "../utils/GridGenerator";
 
-for (let ligne = 1; ligne <= 6; ligne++ ) {
-    for (let column = 1; column <= 6; column++ ) {
-        defaultGrid.push([ligne, column])
-    }
-}
-
-export { defaultGrid }
+export const defaultGrid = GridGenerator(6,6);
