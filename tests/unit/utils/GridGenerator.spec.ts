@@ -3,7 +3,7 @@ import {beforeEach, describe, expect, test, vi } from 'vitest';
 import Pawn from '../../../src/models/Pawn';
 import { GridGenerator } from '../../../src/utils/GridGenerator';
 
-describe('GridGenerator', () => {
+describe('UNIT | GridGenerator', () => {
 
     test('Should Create an array of array', ()=> {
         const grid = GridGenerator(2,2);

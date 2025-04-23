@@ -1,9 +1,9 @@
 import Pawn from '../../../src/models/Pawn';
 import { GridGenerator } from '../../../src/utils/GridGenerator';
-import { PawnSet } from './../../../src/models/PawnSet';
+import { PawnSet } from '../../../src/models/PawnSet';
 import {beforeEach, describe, expect, test, vi } from 'vitest';
 
-describe('PawnSet', () => {
+describe('UNIT | PawnSet', () => {
     let pawnSet;
     beforeEach(()=> {
         pawnSet = new PawnSet();
