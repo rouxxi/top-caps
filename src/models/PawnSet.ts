@@ -7,6 +7,12 @@ export type Team = {
     teamPawns: Pawn[];
 };
 
+type rawConfig = {
+    name: string;
+    kingPosition: [number, number];
+    teamPawns: [number, number][];
+};
+
 export class PawnSet {
     grid: [number, number][] = [];
     teams: Team[] = [];
@@ -14,31 +20,41 @@ export class PawnSet {
     init (config?: any) {
         if (config) {
             this.grid = config.grid;
-            this.teams = config.teams;
+            const teams = [];
+
+            for (const team of config.teams) {
+                teams.push(this.generateEntitiesFromTeamConfig(team))
+            }
+
+            this.teams = teams;
         } else {
             this.grid = defaultGrid;
             this.teams = [
-                {
+                this.generateEntitiesFromTeamConfig({
                     name: 'Team 1',
                     kingPosition: [1,1],
-                    teamPawns:[
-                        new Pawn([1,2],'Team 1'),
-                        new Pawn([2,2],'Team 1'),
-                        new Pawn([3,2],'Team 1'),
-                        new Pawn([4,2],'Team 1')
-                    ]
-                },
-                {
+                    teamPawns:[[1,2],[2,2],[3,2],[4,2]]
+                }),
+                this.generateEntitiesFromTeamConfig({
                     name: 'Team 2',
-                    kingPosition: [6,6],
-                    teamPawns:[
-                        new Pawn([3,5],'Team 1'),
-                        new Pawn([4,5],'Team 1'),
-                        new Pawn([5,5],'Team 1'),
-                        new Pawn([6,5],'Team 1')
-                    ]
-                },
+                    kingPosition: [1,1],
+                    teamPawns:[[3,5],[4,5],[5,5],[6,5]]
+                }),
             ]
+        }
+    }
+    generateEntitiesFromTeamConfig (team: rawConfig) : Team {
+        const teamName = team.name;
+        const pawns = []
+
+        for (const pawnPosition of team.teamPawns) {
+            pawns.push(new Pawn(pawnPosition, teamName))
+        }
+
+        return {
+            name: teamName,
+            kingPosition: team.kingPosition,
+            teamPawns: pawns
         }
     }
 

@@ -13,8 +13,29 @@ describe('UNIT | PawnSet', () => {
             pawnSet.init({ 
                 grid: GridGenerator(2,2),
                 teams: [
-                    {name: 'first team', kingPosition:[1,1], teamPawns: [new Pawn([1,2],'first team')] },
-                    {name: 'Second team', kingPosition:[2,2], teamPawns: [new Pawn([2,1],'Second team')] }
+                    {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2]] },
+                    {name: 'Second team', kingPosition:[2,2], teamPawns: [[2,1]] }
+            ]})
+
+            expect(pawnSet.allPawns).toStrictEqual([new Pawn([1,2],'first team'),new Pawn([2,1],'Second team')])
+        })
+
+        test('should create entity from positions', () => {
+            pawnSet.init({ 
+                grid: GridGenerator(2,2),
+                teams: [
+                    {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2]] },
+                    {name: 'Second team', kingPosition:[2,2], teamPawns: [[2,1]] }
+            ]})
+
+            expect(pawnSet.allPawns).toStrictEqual([new Pawn([1,2],'first team'),new Pawn([2,1],'Second team')])
+        })
+        test('should inject teamName during pawns creation', () => {
+            pawnSet.init({ 
+                grid: GridGenerator(2,2),
+                teams: [
+                    {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2]] },
+                    {name: 'Second team', kingPosition:[2,2], teamPawns: [[2,1]] }
             ]})
 
             expect(pawnSet.allPawns).toStrictEqual([new Pawn([1,2],'first team'),new Pawn([2,1],'Second team')])
@@ -25,7 +46,7 @@ describe('UNIT | PawnSet', () => {
             pawnSet.init({ 
                 grid: GridGenerator(3,3),
                 teams: [
-                    {name: 'first team', kingPosition:[1,1], teamPawns: [new Pawn([1,2],'first team'), new Pawn([2,2],'first team'), new Pawn([2,3],'first team')] },
+                    {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2],[2,2],[2,3]] },
             ]})
 
             const pawn = pawnSet.allPawns[1];
@@ -37,7 +58,7 @@ describe('UNIT | PawnSet', () => {
             pawnSet.init({ 
                 grid: GridGenerator(3,3),
                 teams: [
-                    {name: 'first team', kingPosition:[1,1], teamPawns: [new Pawn([1,2],'first team'), new Pawn([2,2],'first team'), new Pawn([3,3],'first team')] },
+                    {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2], [2,2], [3,3]] },
             ]})
             
             const pawn = pawnSet.allPawns[0];
@@ -49,7 +70,7 @@ describe('UNIT | PawnSet', () => {
             pawnSet.init({ 
                 grid: GridGenerator(3,3),
                 teams: [
-                    {name: 'first team', kingPosition:[1,1], teamPawns: [new Pawn([1,2],'first team'), new Pawn([3,3],'first team'), new Pawn([3,2],'first team')] },
+                    {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2], [3,3], [3,2]] },
             ]})
             
             const pawn = pawnSet.allPawns[0];
@@ -60,8 +81,8 @@ describe('UNIT | PawnSet', () => {
             pawnSet.init({ 
                 grid: GridGenerator(3,3),
                 teams: [
-                    {name: 'first team', kingPosition:[1,1], teamPawns: [new Pawn([1,2],'first team'), new Pawn([2,2],'first team'), new Pawn([3,2],'first team')] },
-                    {name: 'Second team', kingPosition:[3,3], teamPawns: [new Pawn([1,3],'Second team')] }
+                    {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2], [2,2],[3,2]] },
+                    {name: 'Second team', kingPosition:[3,3], teamPawns: [[1,3]] }
             ]})
             
             const pawn = pawnSet.allPawns[0];
@@ -70,6 +91,29 @@ describe('UNIT | PawnSet', () => {
         })
 
     })
+    describe('#generateEntitiesFromTeamConfig', ()=> {
+        test('should read a config and generate entities in teams', () => {
+
+            const config = {
+                grid: GridGenerator(6,6), 
+                teams: [
+                    {name: 'first team', kingPosition:[1,1], teamPawns:[[1,2], [2,2], [3,2]]},
+                    {name: 'Second team', kingPosition:[6,6], teamPawns:[[4,5], [5,5], [6,5]]},
+                ]}
+            pawnSet.init(config)
+
+            const pawns = pawnSet.allPawns;
+
+            expect(pawns).toStrictEqual(
+                [new Pawn([1,2],'first team'),
+                new Pawn([2,2],'first team'),
+                new Pawn([3,2],'first team'),
+                new Pawn([4,5],'Second team'),
+                new Pawn([5,5],'Second team'),
+                new Pawn([6,5],'Second team'),
+            ])
+        })
+    })
     describe('#isPositionEmpty', ()=> {
 
         [[1,3], [2,3], [2,1]].forEach((position)=> {
@@ -77,8 +121,8 @@ describe('UNIT | PawnSet', () => {
                 pawnSet.init({ 
                     grid: GridGenerator(4,4),
                     teams: [
-                        {name: 'first team', kingPosition:[1,1], teamPawns: [new Pawn([1,2],'first team'), new Pawn([2,2],'first team')] },
-                        {name: 'Second team', kingPosition:[4,4], teamPawns: [new Pawn([4,3],'Second team'), new Pawn([3,3],'Second team')] }
+                        {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2], [2,2]] },
+                        {name: 'Second team', kingPosition:[4,4], teamPawns: [[4,3], [3,3]] }
                 ]})
     
                 const result = pawnSet.isPositionEmpty(position);
@@ -92,8 +136,8 @@ describe('UNIT | PawnSet', () => {
                 pawnSet.init({ 
                     grid: GridGenerator(4,4),
                     teams: [
-                        {name: 'first team', kingPosition:[1,1], teamPawns: [new Pawn([1,2],'first team'), new Pawn([2,2],'first team')] },
-                        {name: 'Second team', kingPosition:[4,4], teamPawns: [new Pawn([4,3],'Second team'), new Pawn([3,3],'Second team')] }
+                        {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2],[2,2]] },
+                        {name: 'Second team', kingPosition:[4,4], teamPawns: [[4,3], [3,3]] }
                 ]})
     
                 const result = pawnSet.isPositionEmpty([2,2]);
@@ -136,8 +180,8 @@ describe('UNIT | PawnSet', () => {
             pawnSet.init({ 
                 grid: GridGenerator(4,4),
                 teams: [
-                    {name: 'first team', kingPosition:[1,1], teamPawns: [new Pawn([1,2],'first team')]},
-                    {name: 'Second team', kingPosition:[4,4], teamPawns: [new Pawn([4,3],'Second team'), new Pawn([3,3],'Second team')] }
+                    {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2]]},
+                    {name: 'Second team', kingPosition:[4,4], teamPawns: [[4,3], [3,3]] }
             ]})
 
             const result = pawnSet.availableMoves(pawnSet.allPawns[0]);
@@ -149,7 +193,7 @@ describe('UNIT | PawnSet', () => {
             pawnSet.init({ 
                 grid: GridGenerator(5,5),
                 teams: [
-                    {name: 'first team', kingPosition:[1,1], teamPawns: [new Pawn([3,3],'first team'), new Pawn([3,4],'first team')] },
+                    {name: 'first team', kingPosition:[1,1], teamPawns: [[3,3],[3,4]] },
             ]})
 
             const result = pawnSet.availableMoves(pawnSet.allPawns[0]);
@@ -161,8 +205,8 @@ describe('UNIT | PawnSet', () => {
             pawnSet.init({ 
                 grid: GridGenerator(4,4),
                 teams: [
-                    {name: 'first team', kingPosition:[1,1], teamPawns: [new Pawn([1,2],'first team'), new Pawn([2,2],'first team')] },
-                    {name: 'Second team', kingPosition:[4,4], teamPawns: [new Pawn([4,3],'Second team'), new Pawn([3,3],'Second team')] }
+                    {name: 'first team', kingPosition:[1,1], teamPawns: [[1,2], [2,2]] },
+                    {name: 'Second team', kingPosition:[4,4], teamPawns: [[4,3], [3,3]] }
             ]})
         
             const result = pawnSet.availableMoves(pawnSet.allPawns[1]);
