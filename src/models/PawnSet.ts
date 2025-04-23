@@ -60,16 +60,18 @@ export class PawnSet {
     }
 
     isPositionEmpty (position: [number, number] ) {
-        return this.allPawns.filter((pawn)=> pawn.position[0] === position[0] && pawn.position[1] === position[1]).length === 0;
+        return !this.allPawns.some((pawn)=> pawn.position[0] === position[0] && pawn.position[1] === position[1]);
     }
 
-    availableGridCases (singlePawn: Pawn) {
-        return this.grid.filter(([x, y])=> !this.isKingPosition([x,y], singlePawn.teamName));        
+    isGridCaseExists(position: [number, number]) {
+        return this.grid.some((([x,y])=> x === position[0] && y === position[1]));
     }
 
     nearPawnNumber (singlePawn: Pawn) {
         let nearPawns = 0;
-        for (const nearPosition of singlePawn.nearPositions.filter((nearPosition)=> nearPosition[0] > 0 && nearPosition[1] > 0 && !this.isKingPosition(nearPosition, singlePawn.teamName))) {
+        const positions = singlePawn.nearPositions.filter((nearPosition)=> nearPosition[0] > 0 && nearPosition[1] > 0 && !this.isKingPosition(nearPosition, singlePawn.teamName))
+        
+        for (const nearPosition of positions) {
             if (this.allPawns.filter((pawn)=> pawn.position[0] === nearPosition[0] && pawn.position[1] === nearPosition[1] ).length) {
                 nearPawns += 1;
             }
@@ -80,17 +82,30 @@ export class PawnSet {
 
     availableMoves (pawn: Pawn) {
         const pawnMovesList = this.movesList(pawn);
-        //à refaire pour chaque nearNumber
-        const pawnMovesListFiltered = pawnMovesList.filter(([x, y])=> {
-            if (!this.isPositionEmpty([x, y])) return false;
-            if (!this.availableGridCases(pawn).some(([gridPositionX, gridPositionY])=> gridPositionX === x && gridPositionY === y)) return false
-            return true 
-        });
-        
-        // check si quelqu'un est sur le trajet
-        // check si la case est dans la grille
 
-        // return this.availableCases.includes(position)
+        const pawnMovesListFiltered = pawnMovesList.filter(([x, y])=> {
+            if (!this.isGridCaseExists([x,y])) return false;     
+            if (this.isKingPosition([x,y], pawn.teamName)) return false;
+            if (!this.isPositionEmpty([x, y])) return false;
+
+            const xDiffPositif =  pawn.position[0] - x;
+            const yDiffPositif =  pawn.position[1] - y;
+
+            let isMovmentBlocked = false;
+            for (let i = 1; i <= this.nearPawnNumber(pawn); i++ ) {
+                const newPositionX = xDiffPositif === 0 ? pawn.position[0] : xDiffPositif < 0 ? (pawn.position[0] + i) : (pawn.position[0]-i);
+                const newPositionY = yDiffPositif === 0 ? pawn.position[1] : yDiffPositif < 0 ?  (pawn.position[1] + i) : (pawn.position[1]-i);
+
+                if (!this.isPositionEmpty([newPositionX, newPositionY])) {
+                    isMovmentBlocked = true;
+                }
+            }
+            if (isMovmentBlocked) return false;
+
+            return true
+        });
+
+        return pawnMovesListFiltered;
     }
     
     movesList (pawn: Pawn) {
