@@ -27,7 +27,6 @@ export const STATUSES = {
 export const GAMEPRESET = {
     '1': {
         grid: defaultGrid,
-        selected: false,
         teams: [
         {
             kingPosition: [1,1],
@@ -38,8 +37,30 @@ export const GAMEPRESET = {
             teamPawns:[[3,5],[4,5],[5,5],[6,5]]
         },
     ]},
-    '2': {},
-    '3': {}
+    '2': {
+        grid: defaultGrid,
+        teams: [
+            {
+                kingPosition: [1,1],
+                teamPawns:[[1,2],[2,2],[5,3],[6,3]]
+            },
+            {
+                kingPosition: [6,6],
+                teamPawns:[[1,4],[2,4],[5,5],[6,5]]
+            },
+        ]},
+    '3': {
+        grid: defaultGrid,
+        teams: [
+            {
+                kingPosition: [1,1],
+                teamPawns:[[1,3],[2,3],[3,2],[3,1]]
+            },
+            {
+                kingPosition: [6,6],
+                teamPawns:[[4,6],[4,5],[5,4],[6,4]]
+            },
+        ]}
 }
 
 export class PawnSet {
