@@ -1,5 +1,5 @@
 import { createStore } from 'vuex';
-import { STATUSES } from './models/PawnSet';
+import { STATUSES } from './models/GameService.ts';
 import { httpService } from './services/http-service.ts';
 
 export const store = createStore({

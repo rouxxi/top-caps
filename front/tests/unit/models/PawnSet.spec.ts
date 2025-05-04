@@ -1,12 +1,12 @@
 import Pawn from '../../../src/models/Pawn';
 import { GridGenerator } from '../../../src/utils/GridGenerator';
-import { PawnSet } from '../../../src/models/PawnSet';
+import { GameService } from '../../../src/models/GameService';
 import {beforeEach, describe, expect, test, vi } from 'vitest';
 
 describe('UNIT | PawnSet', () => {
     let pawnSet;
     beforeEach(()=> {
-        pawnSet = new PawnSet();
+        pawnSet = new GameService();
     })
     describe('#init', ()=> {
         test('should create a dynamic grid', () => {

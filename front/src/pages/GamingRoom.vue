@@ -3,14 +3,13 @@ import { useRoute } from 'vue-router';
 import { onMounted, onUpdated, ref, computed } from 'vue';
 import { ThreeService } from '../services/three-service'
 import { useStore } from 'vuex';
-import {STATUSES} from '../models/PawnSet';
+import {type GameInformation, GameService, gameService, STATUSES} from '../models/GameService.ts';
 import { localStorageService } from '../services/storage-local-service';
 import {httpService} from "../services/http-service.ts";
 
 console.log('in script')
 const router = useRoute();
 const store = useStore();
-
 const three = new ThreeService();
 
 function selectDistantMod () {
@@ -27,7 +26,10 @@ function selectTeam(teamName: string) {
 }
 
 onMounted(async ()=> {
-  store.state.currentGame = await httpService.get('/games', {id:router.params.id});
+  const config: GameInformation = await httpService.get('/games', {id:router.params.id})
+  const game = new GameService()
+  game.generate(config)
+  store.state.currentGame = game;
 })
 
 </script>

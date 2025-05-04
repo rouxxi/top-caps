@@ -13,15 +13,12 @@ app.use(bodyParser.json());
 
 app.get('/games', async (req, res) => {
     try {
-        console.log('in the getter')
-        console.log(req.query);
         const id = req.query.id
         if (!id) {
             res.status(400).send("No ID sended")
             return;
         };
         const data = await db.findById(id);
-        console.log(data)
         if (!data) {
             res.status(404).send('Not found')
             return;
@@ -37,11 +34,10 @@ app.get('/games', async (req, res) => {
 
 app.post('/games', async (req, res) => {
     try {
-        const {id, ...payload} = req.body;
-        if (id && payload) {
-            const data = await db.createNewGame(id, payload);
-            console.log('data is created ?' , data)
-            res.status(201).send(JSON.stringify(id));
+        const payload = req.body;
+        if (payload) {
+            await db.createNewGame(payload.id, payload);
+            res.status(201).send(JSON.stringify(payload.id));
             return;
         } else {
             res.status(400).send('Not Created');
@@ -55,11 +51,10 @@ app.post('/games', async (req, res) => {
 
 app.put('/games', async (req, res) => {
     try {
-        const {id, ...payload} = req.body;
-
-        if (id && payload) {
-            await db.updateGame(id, payload);
-            res.status(204).send(id);
+        const payload = req.body;
+        if (payload) {
+            await db.updateGame(payload.id, payload);
+            res.status(204).send(payload.id);
         } else {
             res.status(404).send('NotFound');
         }

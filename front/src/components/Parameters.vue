@@ -2,9 +2,10 @@
 import { ref } from "vue";
 import PawnPreview from "./PawnPreview.vue";
 import gltfFilesFormat from "../configs/gltf-files-format";
-import { useRouter } from "vue-router";
-import { PawnSet } from "../models/PawnSet";
+import { GameService } from "../models/GameService.ts";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+
 
 const pawnsConfigName = gltfFilesFormat.keys(); 
 const pawnSkinNamePlayer1 = ref<string>(pawnsConfigName[0]);
@@ -20,13 +21,15 @@ const store = useStore()
 
 function submit (event: Event) {
     event.preventDefault();
-
   
-    const newGame = new PawnSet();
-    newGame.init();
+    const newGame = new GameService();
+    newGame.generate();
 
-    store.dispatch('createGame', newGame)
-    router.push(`/gaming-room/${newGame.id}`)
+    store.dispatch('createGame', newGame).then((response) => {
+      console.log('after response')
+      console.log(response)
+      router.push(`/gaming-room/${newGame.id}`);
+    })
 }
 
 function selectSkinPawnPlayer1 (event) {

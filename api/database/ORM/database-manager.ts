@@ -1,4 +1,4 @@
-import type {PawnSet} from "../../../front/src/models/PawnSet.ts";
+import type {GameService} from "../../../front/src/models/GameService.ts";
 import { Jsoning } from 'jsoning';
 
 class DatabaseManager {
@@ -15,7 +15,7 @@ class DatabaseManager {
         }
     }
 
-    async createNewGame (id: string, payload: PawnSet) {
+    async createNewGame (id: string, payload: GameService) {
 
         const alreadyExists = await this.findById(id);
         if (alreadyExists) {

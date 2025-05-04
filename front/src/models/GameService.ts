@@ -4,13 +4,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 export type Team = {
     name: string;
-    selected: boolean;
+    selected?: boolean;
     kingPosition: [number, number];
     teamPawns: Pawn[];
 };
 
-type rawConfig = {
+type rawTeam = {
     name: string;
+    selected?: boolean;
     kingPosition: [number, number];
     teamPawns: [number, number][];
 };
@@ -63,36 +64,31 @@ export const GAMEPRESET = {
         ]}
 }
 
-export class PawnSet {
+export type GameInformation = {
     id: string;
     status: string;
     gameMod?: string;
+    activePlayer?: string;
+    grid: [number, number][] | [];
+    teams: rawTeam[];
+}
+
+export class GameService {
+    id: string;
+    status: string;
+    gameMod?: string;
+    activePlayer?: string;
     grid: [number, number][] = [];
     teams: Team[] = [];
-    
+
     constructor () {
         this.id = uuidv4();
         this.status = STATUSES.CREATED;
     }
 
-    setGameMod(mod: string) {
-        this.gameMod = mod;
-    }
-
-    setStatus(status: string) {
-        this.status = status;
-    }
-
-    selectTeam(teamName: string) {
-        for (let team of this.teams) {
-            if (team.name === teamName) {
-                team.selected === true;
-            }
-        }
-    }
-
-    init (config?: any) {
+    generate (config?: GameInformation) {
         if (config) {
+            this.id = config.id;
             this.grid = config.grid;
             const teams = [];
 
@@ -101,8 +97,10 @@ export class PawnSet {
             }
 
             this.teams = teams;
+            this.activePlayer = config.activePlayer || teams?.[0]?.name;
         } else {
             this.grid = defaultGrid;
+            this.activePlayer = 'Team 1';
             this.teams = [
                 this.generateEntitiesFromTeamConfig({
                     name: 'Team 1',
@@ -117,7 +115,7 @@ export class PawnSet {
             ]
         }
     }
-    generateEntitiesFromTeamConfig (team: rawConfig) : Team {
+    generateEntitiesFromTeamConfig (team: rawTeam) : Team {
         const teamName = team.name;
         const pawns = []
 
