@@ -17,11 +17,12 @@ class DatabaseManager {
 
     async createNewGame (id: string, payload: PawnSet) {
 
-        const duplicate = await this.findById(id);
-        if (duplicate) {
+        const alreadyExists = await this.findById(id);
+        if (alreadyExists) {
             throw new Error('Already exists');
         }
-        await database.set(id , payload);
+        const isCreatedGame = await this.database.set(id, payload);
+        return isCreatedGame;
     }
 
     async updateGame (id: string, updateField) {
@@ -38,15 +39,14 @@ class DatabaseManager {
 
     async findById (id) {
         try {
-            return await database.get(id);
+            console.log('in findById', id);
+            const data = await database.get(id);
+            console.log(data)
+            return data
         } catch (error) {
             console.log(error)
-            return;
+            return null;
         }
-    }
-
-    async createGame (payload: PawnSet) {
-
     }
 }
 const database = new Jsoning('./database/database.json')
