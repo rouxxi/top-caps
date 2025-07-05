@@ -46,7 +46,6 @@ export const store = createStore({
             }
 
         },
-        
         selectTeam: async ( {commit, state} , payload)  => {
 
             let numberTeamSelected = 0;

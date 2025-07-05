@@ -1,10 +1,11 @@
 import Pawn from "./Pawn.ts";
-import { defaultGrid } from "../constants";
-import { v4 as uuidv4 } from 'uuid';
+import {defaultGrid} from "../constants";
+import {v4 as uuidv4} from 'uuid';
 
 export type Team = {
     name: string;
     selected?: boolean;
+    pawnSkin?: string;
     kingPosition: [number, number];
     teamPawns: Pawn[];
 };
@@ -18,14 +19,21 @@ type rawTeam = {
 
 export const STATUSES = {
     CREATED: 'created',
-    MOD_SELECTED: 'mod_selected',
     TEAM_SELECTED: 'team_selected',
     STARTED: 'started',
     FINISHED: 'finished'
 }
 
-//TODO penser a injecter le nom de l'équipe
-export const GAMEPRESET = {
+
+type Preset = {
+    grid: [number, number][],
+    teams: {
+        kingPosition: [number, number],
+        teamPawns: [number, number][]
+    }[]
+}
+
+export const GAMEPRESET: Record<string, Preset> = {
     '1': {
         grid: defaultGrid,
         teams: [
@@ -74,63 +82,70 @@ export type GameInformation = {
 }
 
 export class GameService {
-    id: string;
-    status: string;
+    id?: string;
+    status?: string;
     gameMod?: string;
     activePlayer?: string;
     grid: [number, number][] = [];
     teams: Team[] = [];
 
-    constructor () {
-        this.id = uuidv4();
-        this.status = STATUSES.CREATED;
+    createGame(rawInformations: { teams : {name: string, pawnSkin: string}[], preset: number , gameMod: string }) {
+       try {
+           const presetInformation = GAMEPRESET[rawInformations.preset];
+
+           this.id = uuidv4();
+           this.status = STATUSES.CREATED;
+           this.grid = presetInformation.grid
+           this.gameMod = rawInformations.gameMod;
+
+           this.teams = presetInformation.teams.map((team, index) => {
+               team.name = rawInformations.teams[index].name || `Team ${index + 1}`;
+               team.pawnSkin = rawInformations.teams[index].pawnSkin;
+
+               return this.generateEntitiesFromTeamConfig(team);
+           });
+
+           this.activePlayer = this.teams[0].name;
+
+       } catch (err) {
+           console.log(err)
+       }
+       }
+
+    generateFromConfig(config: GameInformation) {
+        this.id = config.id;
+        this.status = config.status;
+        this.gameMod = config.gameMod;
+        this.activePlayer = config.activePlayer;
+        this.grid = config.grid;
+
+        this.teams = config.teams.map((team) => {
+            return this.generateEntitiesFromTeamConfig(team)
+        });
     }
 
-    generate (config?: GameInformation) {
-        if (config) {
-            this.id = config.id;
-            this.grid = config.grid;
-            const teams = [];
-
-            for (const team of config.teams) {
-                teams.push(this.generateEntitiesFromTeamConfig(team))
-            }
-
-            this.teams = teams;
-            this.activePlayer = config.activePlayer || teams?.[0]?.name;
-        } else {
-            this.grid = defaultGrid;
-            this.activePlayer = 'Team 1';
-            this.teams = [
-                this.generateEntitiesFromTeamConfig({
-                    name: 'Team 1',
-                    kingPosition: [1,1],
-                    teamPawns:[[1,2],[2,2],[3,2],[4,2]]
-                }),
-                this.generateEntitiesFromTeamConfig({
-                    name: 'Team 2',
-                    kingPosition: [6,6],
-                    teamPawns:[[3,5],[4,5],[5,5],[6,5]]
-                }),
-            ]
-        }
-    }
-    generateEntitiesFromTeamConfig (team: rawTeam) : Team {
-        const teamName = team.name;
+    generateEntitiesFromTeamConfig (team) : Team {
         const pawns = []
 
         for (const pawnPosition of team.teamPawns) {
-            pawns.push(new Pawn(pawnPosition, teamName))
+            pawns.push(new Pawn(pawnPosition, team.name))
         }
 
         return {
-            name: teamName,
-            selected:false,
+            name: team.name,
+            selected: team.selected || false,
             kingPosition: team.kingPosition,
             teamPawns: pawns
         }
     }
 
+    get teamNames () {
+        let names : string[] = [];
+        for (const team of this.teams ){
+            names.push(team.name);
+        }
+        return names;
+    }
     get allPawns () : Pawn[] {
         let pawns = [];
         for (let team of this.teams) {

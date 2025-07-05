@@ -12,14 +12,6 @@ const router = useRoute();
 const store = useStore();
 const three = new ThreeService();
 
-function selectDistantMod () {
-    store.dispatch('selectMod', {id : router.params.id, gameMod:'distant'})
-}
-
-function selectLocalMod () {
-    store.dispatch('selectMod', {id : router.params.id, gameMod:'local'})
-}
-
 function selectTeam(teamName: string) {
     localStorageService.saveTeam(teamName);
     store.dispatch('selectTeam', {id: router.params.id, teamName })
@@ -28,31 +20,26 @@ function selectTeam(teamName: string) {
 onMounted(async ()=> {
   const config: GameInformation = await httpService.get('/games', {id:router.params.id})
   const game = new GameService()
-  game.generate(config)
+  game.generateFromConfig(config)
   store.state.currentGame = game;
 })
 
 </script>
 
 <template>
-    <section v-if="store.state.currentGame.status === STATUSES.CREATED" class="start-game-menu">
-        <h2>Mode de la partie</h2>
+  <div v-if="store.state.currentGame">
+    <h1> Top Cap duel</h1>
+    <p>Equipe : {{ store.state.currentGame.teamNames?.[0] }}</p>
+    <p>Versus</p>
+    <p>Equipe : {{ store.state.currentGame.teamNames?.[1] }}</p>
+    <h2 v-if="store.state.currentGame.status === STATUSES.STARTED">C'est à l'équipe {{ store.state.currentGame.activePlayer }} de jouer</h2>
+  </div>
 
-        <button :onclick="selectLocalMod" class="button-choice">
-            <p>Partie sur le même ordinateur</p>
-            <img class="computeur-icon" src="/assets/screen-image.png" alt="computeur image" />
-        </button>
-        <button :onclick="selectDistantMod" class="button-choice">
-            <p>Partie à distance</p>
-            <img class="computeur-icon" src="/assets/screen-image.png" aria-hidden />
-            <img class="computeur-icon" src="/assets/screen-image.png" aria-hidden />
-        </button>
-    </section>
-    <section v-if="store.state.currentGame.status === STATUSES.MOD_SELECTED && store.state.currentGame.gameMod !== 'local'">
+    <section v-if="store.state.currentGame.status !== STATUSES.STARTED && store.state.currentGame.gameMod !== 'local'">
         <h2>Choix de l'équipe</h2>
         <button v-for="team in store.state.currentGame.teams" :onclick="()=>selectTeam(team.name)" class="button-choice">
             <p>{{team.name}}</p>
-            <img class="computeur-icon" src="/assets/screen-image.png" alt="computeur image" />
+            <img class="computeur-icon" src="/assets/avatars/nut-face.png" alt="computeur image" />
         </button>
     </section>
     <section v-else>
@@ -64,6 +51,7 @@ onMounted(async ()=> {
 </template>
 
 <style scoped>
+
 .computeur-icon {
     width: 100px;
 }

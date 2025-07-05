@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import {ref} from "vue";
 import PawnPreview from "./PawnPreview.vue";
 import gltfFilesFormat from "../configs/gltf-files-format";
-import { GameService } from "../models/GameService.ts";
+import {GameService} from "../models/GameService.ts";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -14,6 +14,7 @@ const pawnSkinNamePlayer2 = ref<string>(pawnsConfigName[1]);
 const teamName1 = ref('');
 const teamName2 = ref('');
 const gamePreSet = ref(1)
+const gameMod = ref('distant');
 
 
 const router = useRouter()
@@ -23,13 +24,25 @@ function submit (event: Event) {
     event.preventDefault();
   
     const newGame = new GameService();
-    newGame.generate();
+    newGame.createGame({
+      preset: gamePreSet.value,
+      gameMod: gameMod.value,
+      teams: [
+        {name: teamName1.value, pawnSkin:pawnSkinNamePlayer1.value },
+        {name: teamName2.value, pawnSkin:pawnSkinNamePlayer2.value }
+      ]
+    });
 
-    store.dispatch('createGame', newGame).then((response) => {
-      console.log('after response')
-      console.log(response)
+    store.dispatch('createGame', newGame).then(() => {
       router.push(`/gaming-room/${newGame.id}`);
     })
+}
+
+function setPlayerName1 (event) {
+  teamName1.value = event.target.value;
+}
+function setPlayerName2 (event) {
+  teamName2.value = event.target.value;
 }
 
 function selectSkinPawnPlayer1 (event) {
@@ -41,18 +54,30 @@ function selectSkinPawnPlayer2 (event) {
 }
 
 function selectPreset (event) {
-    gamePreSet.value = event.target.value
+   gamePreSet.value = event.target.value
 }
+
+function selectDistantMod (event:Event) {
+  event.preventDefault();
+  gameMod.value = 'distant';
+}
+
+function selectLocalMod (event:Event) {
+  event.preventDefault();
+
+  gameMod.value = 'local';
+}
+
 </script>
 
 <template>
     <section class="parameters-container">
         <h2>Paramètre de la partie</h2>
-        <form class="settings-form" :onsubmit="submit">
+        <form class="settings-form" >
             <articles class="player1">
                 <h3>Joueur 1</h3>
                 <label for="team-name">Nom de l'équipe</label>
-                <input id="team-name" :value="teamName1" type="text"/>
+                <input id="team-name" :value="teamName1" :onchange="setPlayerName1" type="text" placeholder="Team 1"/>
 
                 <label for="pawn-skin-player-1">Pion</label>
                 
@@ -65,7 +90,7 @@ function selectPreset (event) {
             <articles class="player2">
                 <h3>Joueur 2</h3>
                 <label for="team-name">Nom de l'équipe</label>
-                <input id="team-name" :value="teamName2" type="text"/>
+                <input id="team-name" :value="teamName2" :onchange="setPlayerName2" type="text" placeholder="Team 2"/>
 
                 <label for="pawn-skin-player-1">Pion</label>
                 
@@ -85,7 +110,20 @@ function selectPreset (event) {
                 <img class="game-presets-image" src="/assets/presets.png" alt="image d'aide pour les règles" />
             
             </section>
-            <button class="submit-button">Commencer</button>
+            <section  class="game-mod">
+              <h2>Mode de la partie</h2>
+
+              <button :onclick="selectLocalMod" class="button-choice" >
+                <p>Partie locale</p>
+                <img class="computeur-icon" src="/assets/screen-image.png" alt="computeur image" />
+              </button>
+              <button :onclick="selectDistantMod" class="button-choice">
+                <p>Partie à distance</p>
+                <img class="computeur-icon" src="/assets/screen-image.png" aria-hidden />
+                <img class="computeur-icon" src="/assets/screen-image.png" aria-hidden />
+              </button>
+            </section>
+            <button :onclick="submit" class="submit-button" > Commencer </button>
         </form>
     </section>
 
@@ -104,7 +142,7 @@ function selectPreset (event) {
     grid-template-areas: 
     "player1  preset"
     "player2  preset"
-    "submit submit"
+    "gameMod submit"
     ;
     grid-template-columns: 1fr 0.5fr;
     grid-template-rows: 1fr 1fr 0fr;
@@ -117,6 +155,9 @@ function selectPreset (event) {
     .player2 {
         grid-area: player2;
     }
+  .game-mod {
+    grid-area: gameMod;
+  }
     .submit-button {
         grid-area: submit;
         height: fit-content;
@@ -137,6 +178,18 @@ function selectPreset (event) {
     .game-presets-image {
         /* rotate: -90deg; */
         width: 250px;
+    }
+
+    .computeur-icon {
+      width: 70px;
+    }
+
+    .button-choice {
+      text-align: center;
+      margin: 10px;
+      padding: 1rem;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.5);
     }
 }
 </style>
