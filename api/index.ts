@@ -1,7 +1,7 @@
-import {db} from './database/ORM/database-manager.ts';
 import express from 'express';
 import cors from 'cors';
 import bodyParser from "body-parser";
+import gameRepository from './repository/current_games.ts';
 
 const app = express();
 const port = 4200
@@ -17,8 +17,8 @@ app.get('/games', async (req, res) => {
         if (!id) {
             res.status(400).send("No ID sended")
             return;
-        };
-        const data = await db.findById(id);
+        }
+        const data = await gameRepository.getById(id);
         if (!data) {
             res.status(404).send('Not found')
             return;
@@ -36,8 +36,8 @@ app.post('/games', async (req, res) => {
     try {
         const payload = req.body;
         if (payload) {
-            await db.createNewGame(payload.id, payload);
-            res.status(201).send(JSON.stringify(payload.id));
+            const game = await gameRepository.create(payload);
+            res.status(201).send(JSON.stringify(game));
             return;
         } else {
             res.status(400).send('Not Created');
@@ -53,8 +53,8 @@ app.put('/games', async (req, res) => {
     try {
         const payload = req.body;
         if (payload) {
-            await db.updateGame(payload.id, payload);
-            res.status(204).send(payload.id);
+            const game = await gameRepository.update(payload);
+            res.status(204).send(game);
         } else {
             res.status(404).send('NotFound');
         }
