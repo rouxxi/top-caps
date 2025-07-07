@@ -20,22 +20,24 @@ const gameMod = ref('distant');
 const router = useRouter()
 const store = useStore()
 
-function submit (event: Event) {
+async function submit (event: Event) {
     event.preventDefault();
   
-    const newGame = new GameService();
-    newGame.createGame({
+
+    const gameConfig = {
       preset: gamePreSet.value,
       gameMod: gameMod.value,
       teams: [
         {name: teamName1.value, pawnSkin:pawnSkinNamePlayer1.value },
         {name: teamName2.value, pawnSkin:pawnSkinNamePlayer2.value }
       ]
-    });
+    };
 
-    store.dispatch('createGame', newGame).then(() => {
-      router.push(`/gaming-room/${newGame.id}`);
-    })
+    const id = await store.dispatch('createGame', gameConfig);
+
+    if (id) {
+      await router.push(`/gaming-room/${id}`);
+    }
 }
 
 function setPlayerName1 (event) {

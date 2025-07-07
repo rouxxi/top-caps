@@ -33,12 +33,8 @@ export const store = createStore({
         },
         createGame: async ( {commit, state} , payload)  => {
             try {
-                commit('isLoading', true);
-               const data =  await httpService.post('/games', payload)
-                console.log('data in the actions', data)
-                if (data) {
-                    commit('updateGameInfo', data);
-                }
+               const gameId =  await httpService.post('/games', payload)
+               return gameId;
             } catch (err) {
                 console.log(err)
             } finally {
