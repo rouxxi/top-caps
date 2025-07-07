@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from "body-parser";
 import gameRepository from './repository/current_games.ts';
+import {createNewGame} from "./domain/usecases/createNewGame.ts";
 
 const app = express();
 const port = 4200
@@ -36,7 +37,7 @@ app.post('/games', async (req, res) => {
     try {
         const payload = req.body;
         if (payload) {
-            const game = await gameRepository.create(payload);
+            const game = await createNewGame(payload);
             res.status(201).send(JSON.stringify(game));
             return;
         } else {
