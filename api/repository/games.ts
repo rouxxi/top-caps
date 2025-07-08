@@ -19,10 +19,24 @@ interface CurrentGameUpdateProps {
 
 async function getById (id: string) {
     const db = await DatabaseService.connect();
-    let { data, error } = await db
-        .from('current_games')
-        .select('*')
-        .eq('id', id)
+    const {data, error} = await db
+        .from('games')
+        .select(`
+            *,
+            pawns (
+                id,
+                position_x,
+                position_y,
+                player_id
+            ),
+            kings (
+                id,
+                position_x,
+                position_y,
+                player_id
+            )
+        `)
+        .eq('id', id);
 
     if( error) {
         console.log('error ',error)
@@ -36,7 +50,7 @@ async function update (fieds: CurrentGameUpdateProps ) {
     const {id, ...others} = fieds
     const db = await DatabaseService.connect();
     const { data, error } = await db
-        .from('current_games')
+        .from('games')
         .update({ ...others })
         .eq('id', id)
         .select('*');
@@ -52,7 +66,7 @@ async function update (fieds: CurrentGameUpdateProps ) {
 async function create (fieds: CurrentGameUpdateProps ) {
     const db = await DatabaseService.connect();
     const { data, error } = await db
-        .from('current_games')
+        .from('games')
         .insert({...fieds})
         .select()
 
@@ -67,8 +81,37 @@ async function create (fieds: CurrentGameUpdateProps ) {
 async function deleteFromId (id: string ) {
     const db = await DatabaseService.connect();
     const { data, error } = await db
-        .from('current_games')
+        .from('games')
         .delete()
+        .eq('id', id);
+
+    if( error) {
+        console.log('error ',error)
+        return null;
+    }
+
+    return data;
+}
+
+async function get (id: string) {
+    const db = await DatabaseService.connect();
+    const {data, error} = await db
+        .from('games')
+        .select(`
+            *,
+            pawns (
+                id,
+                position_x,
+                position_y,
+                player_id
+            ),
+            kings (
+                id,
+                position_x,
+                position_y,
+                player_id
+            )
+        `)
         .eq('id', id);
 
     if( error) {

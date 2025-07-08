@@ -7,7 +7,6 @@ import {type GameInformation, GameService, gameService, STATUSES} from '../model
 import { localStorageService } from '../services/storage-local-service';
 import {httpService} from "../services/http-service.ts";
 
-console.log('in script')
 const router = useRoute();
 const store = useStore();
 const three = new ThreeService();

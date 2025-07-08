@@ -1,8 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from "body-parser";
-import gameRepository from './repository/current_games.ts';
+import gameRepository from './repository/games.ts';
 import {createNewGame} from "./domain/usecases/createNewGame.ts";
+import {currentGame} from "./domain/usecases/currentGame.ts";
 
 const app = express();
 const port = 4200
@@ -19,7 +20,7 @@ app.get('/games', async (req, res) => {
             res.status(400).send("No ID sended")
             return;
         }
-        const data = await gameRepository.getById(id);
+        const data = await currentGame(id);
         if (!data) {
             res.status(404).send('Not found')
             return;
