@@ -13,7 +13,7 @@ const pawnSkinNamePlayer2 = ref<string>(pawnsConfigName[1]);
 
 const teamName1 = ref('');
 const teamName2 = ref('');
-const gamePreSet = ref(1)
+const gamePreSet = ref(1);
 const gameMod = ref('distant');
 
 
@@ -26,10 +26,10 @@ async function submit (event: Event) {
 
     const gameConfig = {
       preset: gamePreSet.value,
-      gameMod: gameMod.value,
+      game_mod: gameMod.value,
       teams: [
-        {name: teamName1.value, pawnSkin:pawnSkinNamePlayer1.value },
-        {name: teamName2.value, pawnSkin:pawnSkinNamePlayer2.value }
+        {name: teamName1.value, pawns_skin:pawnSkinNamePlayer1.value },
+        {name: teamName2.value, pawns_skin:pawnSkinNamePlayer2.value }
       ]
     };
 
@@ -105,9 +105,9 @@ function selectLocalMod (event:Event) {
             <section class="game-presets">
                 <label for="game-preset-option">Positionnnement de départ</label>
                 <select id="game-preset-option" @change="selectPreset">
-                    <option value={{1}}>Position 1</option>
-                    <option value={{2}}>Position 2</option>
-                    <option value={{3}}>Position 3</option>
+                    <option value=1 >Position 1</option>
+                    <option value=2 >Position 2</option>
+                    <option value=3 >Position 3</option>
                 </select>
                 <img class="game-presets-image" src="/assets/presets.png" alt="image d'aide pour les règles" />
             

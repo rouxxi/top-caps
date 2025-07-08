@@ -1,8 +1,4 @@
-import playersRepository from "../../repository/players.ts";
 import gameRepository from "../../repository/games.ts";
-import kingRepository from "../../repository/kings.ts";
-import pawnRepository from "../../repository/pawns.ts";
-import {getPreset} from "../../utils/gridGenerator.ts";
 
 interface CreateGameBody {
     preset:number;

@@ -1,4 +1,4 @@
-import playersRepository from "../../repository/players.ts";
+import teamsRepository from "../../repository/teams.ts";
 import gameRepository from "../../repository/games.ts";
 import kingRepository from "../../repository/kings.ts";
 import pawnRepository from "../../repository/pawns.ts";
@@ -6,10 +6,10 @@ import {getPreset} from "../../utils/gridGenerator.ts";
 
 interface CreateGameBody {
     preset:number;
-    gameMod: string;
+    game_mod: string;
     teams: {
         name: string,
-        pawnSkin:string
+        pawns_skin:string
     }[]
 }
 
@@ -18,18 +18,18 @@ export async function createNewGame(bodyRequest: CreateGameBody) {
 
     const [game] = await gameRepository.create({
         status: 'created',
-        mode: bodyRequest.gameMod,
+        game_mod: bodyRequest.game_mod,
         grid: preset.grid
     })
 
     for (const team of bodyRequest.teams) {
         const index = bodyRequest.teams.indexOf(team);
-        const [playerCreated] = await playersRepository.create({name: team.name})
+        const [teamCreated] = await teamsRepository.create({name: team.name, game_id: game.id, pawns_skin:team.pawns_skin})
 
         await kingRepository.create({
             position_x: preset.teams[index].kingPosition[0],
             position_y: preset.teams[index].kingPosition[0],
-            player_id: playerCreated.id,
+            team_id: teamCreated.id,
             game_id: game.id,
         })
 
@@ -38,8 +38,7 @@ export async function createNewGame(bodyRequest: CreateGameBody) {
                 await pawnRepository.create({
                     position_x: x,
                     position_y: y,
-                    skin: team.pawnSkin,
-                    player_id: playerCreated.id,
+                    team_id: teamCreated.id,
                     game_id: game.id,
                 })
             }

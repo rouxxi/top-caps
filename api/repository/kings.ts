@@ -4,7 +4,7 @@ interface Kings {
     id?: number;
     position_x?: number;
     position_y?: number;
-    player_id?: number;
+    team_id?: number;
     game_id?: number;
     created_at?: Date | null;
 }

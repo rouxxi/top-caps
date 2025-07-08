@@ -1,12 +1,16 @@
 export default class Pawn {
+    id: number;
     posX : number
     posY : number
+    skin: string
     teamName : string;
 
-    constructor(position: [number, number], teamName: string) {
+    constructor(id: number, position: [number, number], teamName: string, skin: string) {
         this.posX = position[0];
         this.posY = position[1];
         this.teamName = teamName;
+        this.skin = skin;
+        this.id = id;
     }
 
     set newPosition (newPosition: [number, number]) {

@@ -1,21 +1,33 @@
 import Pawn from "./Pawn.ts";
-import {defaultGrid} from "../constants";
-import {v4 as uuidv4} from 'uuid';
 
 export type Team = {
+    id: number;
     name: string;
-    selected?: boolean;
-    pawnSkin?: string;
-    kingPosition: [number, number];
+    selected: boolean;
+    pawns_skin: string;
     teamPawns: Pawn[];
 };
 
-type rawTeam = {
+type RawTeam = {
+    id: number;
     name: string;
-    selected?: boolean;
-    kingPosition: [number, number];
-    teamPawns: [number, number][];
-};
+    pawns_skin: string,
+    selected: boolean;
+}
+type RawPawn = {
+    id: number;
+    team_id: number;
+    position_x: number;
+    position_y: number;
+}
+
+type RawKing = {
+    id: number;
+    team_id: number;
+    position_x: number;
+    position_y: number;
+}
+
 
 export const STATUSES = {
     CREATED: 'created',
@@ -24,119 +36,44 @@ export const STATUSES = {
     FINISHED: 'finished'
 }
 
-
-type Preset = {
-    grid: [number, number][],
-    teams: {
-        kingPosition: [number, number],
-        teamPawns: [number, number][]
-    }[]
-}
-
-export const GAMEPRESET: Record<string, Preset> = {
-    '1': {
-        grid: defaultGrid,
-        teams: [
-        {
-            kingPosition: [1,1],
-            teamPawns:[[1,2],[2,2],[3,2],[4,2]]
-        },
-        {
-            kingPosition: [6,6],
-            teamPawns:[[3,5],[4,5],[5,5],[6,5]]
-        },
-    ]},
-    '2': {
-        grid: defaultGrid,
-        teams: [
-            {
-                kingPosition: [1,1],
-                teamPawns:[[1,2],[2,2],[5,3],[6,3]]
-            },
-            {
-                kingPosition: [6,6],
-                teamPawns:[[1,4],[2,4],[5,5],[6,5]]
-            },
-        ]},
-    '3': {
-        grid: defaultGrid,
-        teams: [
-            {
-                kingPosition: [1,1],
-                teamPawns:[[1,3],[2,3],[3,2],[3,1]]
-            },
-            {
-                kingPosition: [6,6],
-                teamPawns:[[4,6],[4,5],[5,4],[6,4]]
-            },
-        ]}
-}
-
-export type GameInformation = {
-    id: string;
-    status: string;
-    gameMod?: string;
-    activePlayer?: string;
-    grid: [number, number][] | [];
-    teams: rawTeam[];
-}
-
 export class GameService {
     id?: string;
     status?: string;
-    gameMod?: string;
-    activePlayer?: string;
+    game_mod?: string;
+    active_team?: number;
     grid: [number, number][] = [];
     teams: Team[] = [];
 
-    createGame(rawInformations: { teams : {name: string, pawnSkin: string}[], preset: number , gameMod: string }) {
+    generateGame(rawInformations: { id:string,status: string, mode: string, grid: [number, number][],active_team: number |null, pawns: RawPawn[], kings:RawKing[], teams: RawTeam[] }) {
        try {
-           const presetInformation = GAMEPRESET[rawInformations.preset];
+           this.id = rawInformations.id;
+           this.status = rawInformations.status;
+           this.grid = rawInformations.grid
+           this.game_mod = rawInformations.mode;
+           this.active_team = rawInformations.active_team ?? rawInformations.teams[0].id;
 
-           this.id = uuidv4();
-           this.status = STATUSES.CREATED;
-           this.grid = presetInformation.grid
-           this.gameMod = rawInformations.gameMod;
+           const teams = rawInformations.teams.map((team)=> {
+               const pawns = rawInformations.pawns
+                   .filter((pawn)=> pawn.team_id === team.id)
+                   .map((pawn)=> {
+                       return new Pawn(pawn.id, [pawn.position_x, pawn.position_y], team.name, team.pawns_skin)
+                   });
+               const king = rawInformations.kings.find((king)=> king.team_id === team.id);
+               return {
+                   id: team.id,
+                   name: team.name,
+                   selected: team.selected,
+                   kingPosition: [king?.position_x, king?.position_y],
+                   teamPawns: pawns,
+                   pawns_skin: team.pawns_skin
+               }
+           })
 
-           this.teams = presetInformation.teams.map((team, index) => {
-               team.name = rawInformations.teams[index].name || `Team ${index + 1}`;
-               team.pawnSkin = rawInformations.teams[index].pawnSkin;
-
-               return this.generateEntitiesFromTeamConfig(team);
-           });
-
-           this.activePlayer = this.teams[0].name;
+           this.teams = teams
 
        } catch (err) {
            console.log(err)
        }
-       }
-
-    generateFromConfig(config: GameInformation) {
-        this.id = config.id;
-        this.status = config.status;
-        this.gameMod = config.gameMod;
-        this.activePlayer = config.activePlayer;
-        this.grid = config.grid;
-
-        this.teams = config.teams.map((team) => {
-            return this.generateEntitiesFromTeamConfig(team)
-        });
-    }
-
-    generateEntitiesFromTeamConfig (team) : Team {
-        const pawns = []
-
-        for (const pawnPosition of team.teamPawns) {
-            pawns.push(new Pawn(pawnPosition, team.name))
-        }
-
-        return {
-            name: team.name,
-            selected: team.selected || false,
-            kingPosition: team.kingPosition,
-            teamPawns: pawns
-        }
     }
 
     get teamNames () {

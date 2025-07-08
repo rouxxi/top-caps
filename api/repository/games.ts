@@ -3,18 +3,18 @@ import {DatabaseService} from '../services/database.ts';
 interface CurrentGame {
     id: string;
     status: string;
-    mode: string;
+    game_mod: string;
     grid: [number, number][];
-    active_player: number | null;
+    active_team: number | null;
     created_at: Date | null;
 }
 
 interface CurrentGameUpdateProps {
     id?: string;
     status?: string;
-    mode?: string;
+    game_mod?: string;
     grid?: [number, number][];
-    active_player?: number | null;
+    active_team?: number | null;
 }
 
 async function getById (id: string) {
@@ -27,13 +27,19 @@ async function getById (id: string) {
                 id,
                 position_x,
                 position_y,
-                player_id
+                team_id
             ),
             kings (
                 id,
                 position_x,
                 position_y,
-                player_id
+                team_id
+            ),
+            teams (
+                 id,
+                 name,
+                 selected,
+                 pawns_skin
             )
         `)
         .eq('id', id);

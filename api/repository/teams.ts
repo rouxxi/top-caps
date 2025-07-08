@@ -1,15 +1,18 @@
 import {DatabaseService} from '../services/database.ts';
 
-interface Player {
+interface Team {
     id?: number;
     name: string;
+    selected?: boolean;
+    pawns_skin: string;
+    game_id: string;
     created_at?: Date | null;
 }
 
 async function getById (id: number) {
     const db = await DatabaseService.connect();
     let { data, error } = await db
-        .from('players')
+        .from('teams')
         .select('*')
         .eq('id', id)
 
@@ -21,11 +24,11 @@ async function getById (id: number) {
     return data;
 }
 
-async function update (fieds: Player ) {
+async function update (fieds: Team ) {
     const {id, ...others} = fieds
     const db = await DatabaseService.connect();
     const { data, error } = await db
-        .from('players')
+        .from('teams')
         .update({ ...others })
         .eq('id', id)
         .select('*');
@@ -38,10 +41,10 @@ async function update (fieds: Player ) {
     return data;
 }
 
-async function create (fieds: Player ) {
+async function create (fieds: Team ) {
     const db = await DatabaseService.connect();
     const { data, error } = await db
-        .from('players')
+        .from('teams')
         .insert({...fieds})
         .select()
 
@@ -56,7 +59,7 @@ async function create (fieds: Player ) {
 async function deleteFromId (id: number ) {
     const db = await DatabaseService.connect();
     const { data, error } = await db
-        .from('players')
+        .from('teams')
         .delete()
         .eq('id', id);
 

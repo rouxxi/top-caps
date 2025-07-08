@@ -5,7 +5,7 @@ interface Pawn {
     position_x?: number;
     position_y?: number;
     skin?: string;
-    player_id?: number;
+    team_id?: number;
     game_id?: number;
     created_at?: Date | null;
 }
