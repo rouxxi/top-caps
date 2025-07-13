@@ -4,15 +4,29 @@ import { httpService } from './services/http-service.ts';
 
 export const store = createStore({
     state: {
-        currentGame: {},
+        gameInformation: {},
+        teams: [],
+        pawns: {},
+        kings: {},
         isLoading: false,
     },
     mutations: {
+        setKings: (state, kings) => {
+            state.kings = kings;
+        },
+        setPawns: (state, pawns) => {
+            state.pawns = pawns;
+        },
+        setTeams: (state, teams) => {
+            state.teams = teams;
+        },
+        setGameInformation: (state, gameInformation) => {
+            state.gameInformation = gameInformation;
+        },
         isLoading: (state, arg) => {
             state.isLoading = arg;
         },
         updateGameInfo: (state, payload) => {
-            console.log('in mutation', payload);
              state.currentGame = payload ;
         },
         selectMod: (state, payload ) => {
@@ -65,6 +79,11 @@ export const store = createStore({
     getters: {
         getCurrentGame: (state) => {
             return state.currentGame;
-        }
+        },
+        getFirsteamName: (state) => {
+            if (state.teams.length === 2) {
+                return state.teams[0].name;
+            }
+        },
       }
 }) 
