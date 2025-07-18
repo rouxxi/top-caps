@@ -2,7 +2,6 @@
 import {ref} from "vue";
 import PawnPreview from "./PawnPreview.vue";
 import gltfFilesFormat from "../configs/gltf-files-format";
-import {GameService} from "../models/GameService.ts";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 

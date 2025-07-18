@@ -1,7 +1,7 @@
 import {createClient} from "@supabase/supabase-js";
 
 export class Subscritpions {
-    static async subPawns(id: string, callbackFunction) {
+    static async subPawns(id: string, callbackFunction: (arg:unknown) => void) {
         const databaseConnexion = createClient(import.meta.env.VITE_DATABASE_URL, import.meta.env.VITE_DATABASE_KEY)
         databaseConnexion
             .channel(`public:pawns`)
@@ -11,7 +11,7 @@ export class Subscritpions {
             .subscribe()
     }
 
-    static subGame(id: string, callbackFunction) {
+    static subGame(id: string, callbackFunction: (arg:unknown) => void) {
         const databaseConnexion = createClient(import.meta.env.VITE_DATABASE_URL, import.meta.env.VITE_DATABASE_KEY)
 
         databaseConnexion
@@ -22,7 +22,7 @@ export class Subscritpions {
             .subscribe()
     }
 
-    static subTeams(id: string, callbackFunction) {
+    static subTeams(id: string, callbackFunction: (arg:unknown) => void) {
         const databaseConnexion = createClient(import.meta.env.VITE_DATABASE_URL, import.meta.env.VITE_DATABASE_KEY)
 
         databaseConnexion
