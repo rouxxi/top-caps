@@ -1,6 +1,6 @@
 import Pawn from '../../../src/models/Pawn';
 import { GridGenerator } from '../../../src/utils/GridGenerator';
-import { GameService } from '../../../src/models/GameService';
+import { GameService } from '../../../src/services/GameService';
 import {beforeEach, describe, expect, test, vi } from 'vitest';
 
 describe('UNIT | PawnSet', () => {
