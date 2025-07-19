@@ -33,15 +33,13 @@ export async function createNewGame(bodyRequest: CreateGameBody) {
             game_id: game.id,
         })
 
-        for (const {teamPawns } of preset.teams) {
-            for (const [x,y] of teamPawns) {
-                await pawnRepository.create({
-                    position_x: x,
-                    position_y: y,
-                    team_id: teamCreated.id,
-                    game_id: game.id,
-                })
-            }
+        for (const [x,y] of preset.teams[index].teamPawns) {
+            await pawnRepository.create({
+                position_x: x,
+                position_y: y,
+                team_id: teamCreated.id,
+                game_id: game.id,
+            })
         }
     }
 
