@@ -23,6 +23,8 @@ export class ThreeService {
     raycaster: THREE.Raycaster;
     gridHelper?: THREE.GridHelper;
     game?: GameService;
+    selectedPawn?: THREE.Object3D;
+    possibleMoveToString?: string[];
 
     constructor(isPreview: boolean = false) {
         this.mousePositionEvent = this.mousePositionEvent.bind(this);
@@ -126,51 +128,43 @@ export class ThreeService {
             const intersect = this.raycaster.intersectObject(board);
             const selectedTile = intersect.find((obj) => obj.object.name.includes('tile')); // je n'arrive pas a selectionner mes pawns xD
             const tilePosition = selectedTile?.object.game_position;
-            const selectedPawn = this.scene.getObjectByName( `pawn-${tilePosition}`);
-            if (selectedPawn) {
-                console.log('in selected')
-                const pawn = this.game?.findPawn(selectedPawn.game_id);
+
+            console.log(selectedTile);
+            if (!this.selectedPawn && !selectedTile?.object?.is_available_move) {
+                this.selectedPawn = this.scene.getObjectByName( `pawn-${tilePosition}`);
+            } else if (this.selectedPawn && selectedTile?.object?.is_available_move) {
+                console.log('translate pawn')
+                //TODO translate pawn
+                //TODO faire la condition pour vérifier que le pion est bien le mm que celui selectionné
+            } else {
+                this.selectedPawn = undefined;
+            }
+            console.log('selectedPawn',this.selectedPawn);
+
+            //TODO ajouter un check que les case available ne sont précisé que pour un piont
+            if (this.selectedPawn && selectedTile && this.scene.getObjectsByProperty('is_available_move', true).length === 0) {
+                const pawn = this.game?.findPawn(this.selectedPawn.game_id);
                 const availableMoves = this.game?.availableMoves(pawn);
-                const readableMovePosition = availableMoves.map((position) => position.join(','));
+                this.possibleMoveToString = availableMoves?.map((position) => position.join(','));
 
                 this.scene.traverse((element) => {
-                    if (readableMovePosition.includes(element.name.split('-')[1]) && element.isObject3D) {
-                        console.log('before',element.material.color)
+                    if (this.possibleMoveToString?.includes(element.name.split('-')[1]) && element.isObject3D) {
                         element.is_available_move = true;
                         element.material.color.set({r:0, g:255, b:0, isColor: true})
-                        console.log('after colorized',element)
                     }
                 })
-
-
-                // selectedPawn.translateZ(selectedPawn.position.x +1);
-                // selectedPawn.translateX(selectedPawn.position.z +1);
             } else {
-                console.log('in else')
-
                 this.scene.traverse((element) => {
                     if (element.original_color) {
-                        console.log('old_color', element.original_color)
                         element.material.color.set(element.original_color)
-                        // element.old_color = undefined;
                     }
 
                     if (element.is_available_move) {
-                        console.log('is_available_move', element)
                         element.is_available_move = false;
                     }
-
                 })
             }
-            //
-            // const selectedPawn = pawns?.getObjectsByProperty('game_position',tilePosition );
-            //     console.log({selectedPawn, tilePosition, pawns})
-            // if (selectedPawn?.[0]) {
-            // }
-
         }
-        // this.renderer?.render( this.scene, this.camera );
-
     }
 
 
