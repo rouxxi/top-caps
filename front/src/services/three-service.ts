@@ -94,7 +94,6 @@ export class ThreeService {
             serializedTeam.push({id: team.id, name: team.name, selected: team.selected, pawns_skin:team.pawns_skin , kingPosition: [teamKing.position_x, teamKing.position_y], teamPawns});
         }
 
-        console.log({serializedTeam})
         this.game = new GameService({
             status: gameInformation.status,
             game_mod: gameInformation.game_mod,
@@ -133,9 +132,22 @@ export class ThreeService {
             if (!this.selectedPawn && !selectedTile?.object?.is_available_move) {
                 this.selectedPawn = this.scene.getObjectByName( `pawn-${tilePosition}`);
             } else if (this.selectedPawn && selectedTile?.object?.is_available_move) {
-                console.log('translate pawn')
-                //TODO translate pawn
+                const positionToMove = selectedTile.object.name.split('-')[1].split(',').map((el)=> parseInt(el));
+
+                const pawnToMove = this.scene.getObjectByName( this.selectedPawn.name);
+
+                if (pawnToMove) {
+                    pawnToMove.position.set(positionToMove[0] + 1, this.selectedPawn.position.y, positionToMove[1] + 1);
+                    pawnToMove.name = `pawn-${positionToMove[0]},${positionToMove[1]}`
+                }
+
+                const gamePawn = this.game?.findPawn(pawnToMove?.game_id)
+
+                if (gamePawn) {
+                    gamePawn.setNewPosition([positionToMove[0], positionToMove[1]]);
+                }
                 //TODO faire la condition pour vérifier que le pion est bien le mm que celui selectionné
+                this.selectedPawn = undefined;
             } else {
                 this.selectedPawn = undefined;
             }
