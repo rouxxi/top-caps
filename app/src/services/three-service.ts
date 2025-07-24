@@ -2,9 +2,9 @@ import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import gltfImportFormat from '../configs/gltf-files-format';
-import type {RawKing, RawPawn, RawTeam, Team, GameInformation} from "./GameService.ts";
+import type {RawKing, RawPawn, RawTeam, GameInformation} from "./GameService.ts";
 import  {GameService} from "./GameService.ts";
-import {Object3D} from "three";
+import { Object3D} from "three";
 import Pawn from "../models/Pawn.ts";
 
 type Grid = [number, number][];
@@ -28,6 +28,8 @@ export class ThreeService {
 
     constructor(isPreview: boolean = false) {
         this.mousePositionEvent = this.mousePositionEvent.bind(this);
+        this.mouseTracking = this.mouseTracking.bind(this);
+        // this.applyClick = this.applyClick.bind(this);
 
         this.isPreviewMod = isPreview;
         this.gltfLoader = new GLTFLoader();
@@ -73,8 +75,10 @@ export class ThreeService {
             this.controls.maxDistance = 180;
             // controls.enablePan = false;
             this.controls.target.set(1, 1, 1);
-
             this.renderer?.domElement.addEventListener('click', this.mousePositionEvent, false )
+
+            // this.renderer?.domElement.addEventListener('click', this.applyClick, false )
+            this.renderer?.domElement.addEventListener('mousemove', this.mouseTracking, false )
 
             const render = () => {
                 this.raycaster.setFromCamera( this.mousePosition, this.camera );
@@ -86,6 +90,22 @@ export class ThreeService {
             requestAnimationFrame( render );
         }
     }
+
+    mouseTracking ( event) {
+        const canvas = event.target,
+            box = canvas.getBoundingClientRect(),
+            x = event.clientX - box.left,
+            y = event.clientY - box.top;
+
+        this.mousePosition.setX( ( x / canvas.scrollWidth ) * 2 - 1);
+        this.mousePosition.setY(- ( y / canvas.scrollHeight ) * 2 + 1);
+    }
+
+    applyClick (event) {
+        this.mousePositionEvent(event);
+        this.renderer?.render( this.scene, this.camera );
+    }
+
     consumeGameInformation ({ gameInformation , pawns, kings, teams}: { gameInformation: GameInformation , pawns: RawPawn[], kings: RawKing[], teams: RawTeam[]}) {
         let serializedTeam = []
         for (let team of teams) {
@@ -112,15 +132,6 @@ export class ThreeService {
     }
 
     mousePositionEvent (event) {
-        const canvas = event.target,
-            box = canvas.getBoundingClientRect(),
-            x = event.clientX - box.left,
-            y = event.clientY - box.top;
-
-        // set mouse Vector2 values
-        this.mousePosition.setX( ( x / canvas.scrollWidth ) * 2 - 1);
-        this.mousePosition.setY(- ( y / canvas.scrollHeight ) * 2 + 1);
-
         const board = this.scene.getObjectByName('board-group');
         console.log({board});
         if (board instanceof Object3D) {
@@ -151,7 +162,6 @@ export class ThreeService {
             } else {
                 this.selectedPawn = undefined;
             }
-            console.log('selectedPawn',this.selectedPawn);
 
             //TODO ajouter un check que les case available ne sont précisé que pour un piont
             if (this.selectedPawn && selectedTile && this.scene.getObjectsByProperty('is_available_move', true).length === 0) {
