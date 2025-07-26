@@ -3,14 +3,14 @@ export default class Pawn {
     position_x : number
     position_y : number
     skin: string
-    teamName : string;
+    teamId : number;
 
-    constructor(id: number, position_x: number, position_y: number, teamName: string, skin: string) {
+    constructor(id: number, position_x: number, position_y: number, teamId: number, skin: string) {
         this.setNewPosition = this.setNewPosition.bind(this);
 
         this.position_x = position_x;
         this.position_y = position_y;
-        this.teamName = teamName;
+        this.teamId = teamId;
         this.skin = skin;
         this.id = id;
     }

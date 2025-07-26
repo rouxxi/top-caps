@@ -78,13 +78,13 @@ export class GameService {
         return pawn
     }
 
-    findKingPositionByTeamName (teamName: string) {
-        const  team = this.teams.find((team) => team.name === teamName)
+    findKingPositionByTeamName (teamId: number) {
+        const  team = this.teams.find((team) => team.id === teamId)
         return team?.kingPosition
     }
 
-    isKingPosition (position: number[] , team: string) {
-        return position[0] === this.findKingPositionByTeamName(team)?.[0] && position[1] === this.findKingPositionByTeamName(team)?.[1]  
+    isKingPosition (position: number[] , teamId: number) {
+        return position[0] === this.findKingPositionByTeamName(teamId)?.[0] && position[1] === this.findKingPositionByTeamName(teamId)?.[1]
     }
 
     isPositionEmpty (position: [number, number] ) {
@@ -97,7 +97,7 @@ export class GameService {
 
     nearPawnNumber (singlePawn: Pawn) {
         let nearPawns = 0;
-        const positions = singlePawn.nearPositions.filter((nearPosition)=> nearPosition[0] > 0 && nearPosition[1] > 0 && !this.isKingPosition(nearPosition, singlePawn.teamName))
+        const positions = singlePawn.nearPositions.filter((nearPosition)=> nearPosition[0] > 0 && nearPosition[1] > 0 && !this.isKingPosition(nearPosition, singlePawn.teamId))
         
         for (const nearPosition of positions) {
             if (this.allPawns.filter((pawn)=> pawn.position[0] === nearPosition[0] && pawn.position[1] === nearPosition[1] ).length) {
@@ -108,12 +108,16 @@ export class GameService {
         return nearPawns;
     }
 
+    get isGameFinished () {
+        return this.allPawns.some((pawn) => this.isKingPosition(pawn.position, this.teams[0].id)  || this.isKingPosition(pawn.position, this.teams[1].id)  )
+    }
+
     availableMoves (pawn: Pawn) {
         const pawnMovesList = this.movesList(pawn);
 
         const pawnMovesListFiltered = pawnMovesList.filter(([x, y])=> {
             if (!this.isGridCaseExists([x,y])) return false;     
-            if (this.isKingPosition([x,y], pawn.teamName)) return false;
+            if (this.isKingPosition([x,y], pawn.teamId)) return false;
             if (!this.isPositionEmpty([x, y])) return false;
 
             const xDiffPositif =  pawn.position[0] - x;

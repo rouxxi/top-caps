@@ -112,7 +112,7 @@ export class ThreeService {
     consumeGameInformation ({ gameInformation , pawns, kings, teams}: { gameInformation: GameInformation , pawns: RawPawn[], kings: RawKing[], teams: RawTeam[]}) {
         let serializedTeam = []
         for (let team of teams) {
-            const teamPawns = pawns.filter((pawn)=> pawn.team_id === team.id).map((pawn)=>(new Pawn(pawn.id, pawn.position_x, pawn.position_y,team.name, team.pawns_skin)));
+            const teamPawns = pawns.filter((pawn)=> pawn.team_id === team.id).map((pawn)=>(new Pawn(pawn.id, pawn.position_x, pawn.position_y, team.id, team.pawns_skin)));
             const teamKing = kings.find((king)=> king.team_id === team.id);
             serializedTeam.push({id: team.id, name: team.name, selected: team.selected, pawns_skin:team.pawns_skin , kingPosition: [teamKing.position_x, teamKing.position_y], teamPawns});
         }
