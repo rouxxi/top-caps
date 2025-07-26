@@ -243,9 +243,9 @@ export class ThreeService {
         this.scene.add( pawnsGroup );
         pawnsGroup.name = 'pawns-group';
         for (let pawn of pawnArray) {
-            // const team = teams.find((team)=> pawn.team_id === team.id)
+            const team = teams.find((team)=> pawn.team_id === team.id);
             this.loadPawn(
-             'black_caps',// team?.pawns_skin,
+             team?.pawns_skin,
              [pawn.position_x,pawn.position_y],
              pawn.id,
                // this.scene
@@ -304,23 +304,12 @@ export class ThreeService {
                     config.preview.toCenterPosition.z
                 );
                 gltf.scene.children[0].rotation.set(
-                    config.preview.toPlanRotation.x,
-                    config.preview.toPlanRotation.y,
-                    config.preview.toPlanRotation.z
+                    config.preview.rotation.x,
+                    config.preview.rotation.y,
+                    config.preview.rotation.z
                 );
 
                 gltf.scene.position.set(0,0,0);
-
-                // if (materials.length > 0) {
-                //     console.log(document.getRootNode())
-
-                //     gltf.scene.traverse((node)=> {
-                //         if (node.isMesh) {
-                //         node.material.map = materials
-                //         }
-                //     })
-                // }
-
                 this.scene.add(gltf.scene)
             },
             (prog) => {
@@ -339,14 +328,17 @@ export class ThreeService {
     }
 
     loadPawn (name: string, position: [number, number], id, group) {
-         this.gltfLoader.load(`/assets/pawn-skin/${name}/scene.gltf`,
+        if (!name) return;
+        const config = gltfImportFormat.getConfigByName(name);
+        if (!config) return;
+        this.gltfLoader.load(`/assets/pawn-skin/${name}/scene.gltf`,
             (gltf) => {
-                gltf.scene.position.set(position[0]+0.75,1.55,position[1] +1.2);
+                gltf.scene.position.set(position[0]+ config.game.position.x,config.game.position.y,position[1] + config.game.position.z);
 
-                gltf.scene.rotateZ(-84.3)
-                gltf.scene.rotateX(-0.35)
+                gltf.scene.rotateZ(config.game.rotation.z)
+                gltf.scene.rotateX(config.game.rotation.x)
+                gltf.scene.scale.set(config.game.scale.x,config.game.scale.y,config.game.scale.z);
 
-                gltf.scene.scale.set(0.2,0.2,0.2);
                 gltf.scene.game_id = id;
                 gltf.scene.game_position = position.join(',');
                 gltf.scene.name = `pawn-${position.join(',')}`
