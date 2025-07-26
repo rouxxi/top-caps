@@ -27,7 +27,7 @@ export class ThreeService {
     possibleMoveToString?: string[];
 
     constructor(isPreview: boolean = false) {
-        this.mousePositionEvent = this.mousePositionEvent.bind(this);
+        this.clickEvent = this.clickEvent.bind(this);
         this.mouseTracking = this.mouseTracking.bind(this);
         // this.applyClick = this.applyClick.bind(this);
 
@@ -75,12 +75,15 @@ export class ThreeService {
             this.controls.maxDistance = 180;
             // controls.enablePan = false;
             this.controls.target.set(1, 1, 1);
-            this.renderer?.domElement.addEventListener('click', this.mousePositionEvent, false )
+            this.renderer?.domElement.addEventListener('click', this.clickEvent, false )
 
             // this.renderer?.domElement.addEventListener('click', this.applyClick, false )
             this.renderer?.domElement.addEventListener('mousemove', this.mouseTracking, false )
 
             const render = () => {
+                //TODO faire des presets pour 3 / 4 position de camera
+                // this._setDefaufaultCameraPosition();
+
                 this.raycaster.setFromCamera( this.mousePosition, this.camera );
                 this.renderer?.render( this.scene, this.camera );
 
@@ -102,7 +105,7 @@ export class ThreeService {
     }
 
     applyClick (event) {
-        this.mousePositionEvent(event);
+        this.clickEvent(event);
         this.renderer?.render( this.scene, this.camera );
     }
 
@@ -131,7 +134,7 @@ export class ThreeService {
         this.scene.rotation.set(-0.6953905063863763,-0.02340503126905997,-0.019525808419736532);
     }
 
-    mousePositionEvent (event) {
+    clickEvent (event) {
         const board = this.scene.getObjectByName('board-group');
         console.log({board});
         if (board instanceof Object3D) {
