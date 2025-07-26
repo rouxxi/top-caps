@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
-import {onMounted, ref} from 'vue';
+import {computed, onMounted, ref, watch } from 'vue';
 import {STATUSES} from '../services/GameService.ts';
 import GameOverview from '../components/GameOverview.vue';
 import {httpService} from "../services/http-service.ts";
@@ -10,14 +10,23 @@ const route = useRoute();
 const router = useRouter();
 const teams = ref([]);
 const kings = ref([]);
-const pawns = ref([]);
+const pawns = ref();
 const gameInformation = ref({});
 
 Subscritpions.subGame(route.params.id, setUpdatedGameInfo );
 Subscritpions.subTeams(route.params.id, setTeamsInfo );
 Subscritpions.subPawns(route.params.id, setPawnsInfo );
 
+const game = ref();
 
+watch([teams,kings, pawns, gameInformation ],  async (payload)=> {
+  console.log('trigger watcher')
+  console.log({payload})
+  console.log([teams.value,kings.value, pawns.value, gameInformation.value ])
+  const response = await httpService.get('/games', {id:route.params.id});
+  console.log({response});
+  game.value = response;
+})
 
 function setUpdatedGameInfo (payload) {
   gameInformation.value = payload;
@@ -34,10 +43,11 @@ function setKingsInfo (payload) {
 }
 
 function isInformationLoaded () {
-  return teams.value.length > 0
-      && pawns.value.length > 0
+  return game.value?.status
+      && game.value?.teams?.length > 0
+      && game.value?.pawns?.length > 0
       && Object.keys(gameInformation.value).length > 0
-      && kings.value.length > 0;
+      && game.value?.kings?.length > 0;
 }
 
 onMounted(async ()=> {
@@ -61,14 +71,9 @@ onMounted(async ()=> {
             <img class="team-icon" src="/assets/avatars/nut-face.png" alt="computeur image" />
         </button>
     </section>
-
-    <GameOverview
-        v-if="isInformationLoaded()"
-        :gameInformation="gameInformation"
-        :kings="kings"
-        :pawns="pawns"
-        :teams="teams"
-    />
+    {{isInformationLoaded()}}
+    {{game}}
+    <GameOverview v-if="isInformationLoaded()" :game="game" :pawnToUpdate="pawns"/>
 
     <button :onclick="() => router.go(-1)">back</button>
 

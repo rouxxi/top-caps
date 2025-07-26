@@ -1,22 +1,64 @@
 <script setup lang="ts">
 import {ThreeService} from "../services/three-service.ts";
-import {onMounted, useTemplateRef} from "vue";
-import type {RawKing, RawPawn, RawTeam, GameInformation} from "../services/GameService.ts";
+import {onMounted, onUpdated, useTemplateRef, watch} from "vue";
+import type {RawKing, RawPawn, RawTeam} from "../services/GameService.ts";
 
 const props = defineProps<{
-  gameInformation: GameInformation | {},
-  pawns: RawPawn[],
-  kings: RawKing[],
-  teams: RawTeam[]
+  pawnToUpdate: RawPawn,
+  game: {
+    pawns: RawPawn[],
+    kings: RawKing[],
+    teams: RawTeam[],
+    active_team: null | number,
+    created_at: string,
+    game_mod: string,
+    grid: [number, number][],
+    id: string,
+    status: string,
+  }
 }>()
 const three = new ThreeService();
 const gameOverview = useTemplateRef('game-overview');
 
+
+console.log('props.game before mount', props.game);
 onMounted(()=> {
+  console.log('trigger mounted');
+  console.log({active_team: props.game.active_team, created_at: props.game.created_at, game_mod: props.game.game_mod, grid: props.game.grid, id:props.game.id, status: props.game.status});
+  console.log('props.game in mount', props.game);
   three.init(gameOverview.value)
-  three.generateBattleField(props.gameInformation.grid)
-  three.generatePawns(props.pawns, props.teams);
-  three.consumeGameInformation( { gameInformation: props.gameInformation ,pawns: props.pawns, kings: props.kings, teams: props.teams})
+  three.generateBattleField(props.game.grid)
+  three.generatePawns(props.game.pawns, props.game.teams);
+  three.consumeGameInformation( {
+    pawns: props.game.pawns,
+    kings: props.game.kings,
+    teams: props.game.teams,
+    gameInformation: {
+      active_team: props.game.active_team,
+      game_mod: props.game.game_mod,
+      grid: props.game.grid,
+      id: props.game.id,
+      status: props.game.status
+    } })
+})
+
+onUpdated( ()=> {
+  console.log('trigger updated')
+  console.log('props.pawnToUpdate', props.pawnToUpdate)
+  if (props.pawnToUpdate) {
+    three.applyPawnChanges(props.pawnToUpdate)
+  }
+  // three.consumeGameInformation({
+  //   pawns: props.game.pawns,
+  //   kings: props.game.kings,
+  //   teams: props.game.teams,
+  //   gameInformation: {
+  //     active_team: props.game.active_team,
+  //     game_mod: props.game.game_mod,
+  //     grid: props.game.grid,
+  //     id: props.game.id,
+  //     status: props.game.status
+  //   } })
 })
 
 

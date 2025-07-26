@@ -32,7 +32,8 @@ export type RawKing = {
 export type GameInformation = {
     grid:[number,number][],
     id:string,
-    status: string, game_mode: string,
+    status: string,
+    game_mod: string,
     active_team: number | null
 }
 

@@ -76,14 +76,14 @@ export class ThreeService {
             // controls.enablePan = false;
             this.controls.target.set(1, 1, 1);
             this.renderer?.domElement.addEventListener('click', this.clickEvent, false )
-
-            // this.renderer?.domElement.addEventListener('click', this.applyClick, false )
             this.renderer?.domElement.addEventListener('mousemove', this.mouseTracking, false )
 
             const render = () => {
                 //TODO faire des presets pour 3 / 4 position de camera
                 // this._setDefaufaultCameraPosition();
 
+                this._setDefaufaultCameraPosition()
+                // console.log(this.game?.isGameFinished)
                 this.raycaster.setFromCamera( this.mousePosition, this.camera );
                 this.renderer?.render( this.scene, this.camera );
 
@@ -104,9 +104,23 @@ export class ThreeService {
         this.mousePosition.setY(- ( y / canvas.scrollHeight ) * 2 + 1);
     }
 
-    applyClick (event) {
-        this.clickEvent(event);
-        this.renderer?.render( this.scene, this.camera );
+    applyPawnChanges (pawn) {
+        console.log("applyPawnChanges")
+        console.log(this.scene)
+        const objects3D = this.scene.getObjectsByProperty( 'game_id', pawn.id);
+        const pawnToMove = objects3D.find( object => object.name.includes('pawn'))
+        console.log({pawnToMove})
+        if (pawnToMove) {
+            pawnToMove?.position.setX(pawn.position_x +1);
+            pawnToMove?.position.setZ(pawn.position_y +1);
+
+            const gamePawn = this.game?.findPawn(pawn?.id)
+
+            if (gamePawn) {
+                gamePawn.setNewPosition([pawn[0], pawn[1]]);
+            }
+
+        }
     }
 
     consumeGameInformation ({ gameInformation , pawns, kings, teams}: { gameInformation: GameInformation , pawns: RawPawn[], kings: RawKing[], teams: RawTeam[]}) {
