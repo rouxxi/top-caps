@@ -1,31 +1,27 @@
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router';
-import {computed, onMounted, ref, watch } from 'vue';
-import {STATUSES} from '../services/GameService.ts';
+import {useRoute, useRouter} from 'vue-router';
+import {computed, onMounted, ref, watch} from 'vue';
+import { RawTeam, STATUSES} from '../services/GameService.ts';
 import GameOverview from '../components/GameOverview.vue';
 import {httpService} from "../services/http-service.ts";
 import {Subscritpions} from "../services/subscritpions.ts";
+import {userService} from "../services/user-servive.ts";
 
 const route = useRoute();
 const router = useRouter();
 const teams = ref([]);
 const kings = ref([]);
-const pawns = ref();
+const pawnToUpdate = ref();
 const gameInformation = ref({});
 
-Subscritpions.subGame(route.params.id, setUpdatedGameInfo );
+Subscritpions.subGame(route.params.id, setUpdatedGameInfo);
 Subscritpions.subTeams(route.params.id, setTeamsInfo );
 Subscritpions.subPawns(route.params.id, setPawnsInfo );
 
 const game = ref();
 
-watch([teams,kings, pawns, gameInformation ],  async (payload)=> {
-  console.log('trigger watcher')
-  console.log({payload})
-  console.log([teams.value,kings.value, pawns.value, gameInformation.value ])
-  const response = await httpService.get('/games', {id:route.params.id});
-  console.log({response});
-  game.value = response;
+watch([teams,kings, pawnToUpdate, gameInformation ],  async (payload)=> {
+  game.value = await httpService.get('/games', {id: route.params.id});
 })
 
 function setUpdatedGameInfo (payload) {
@@ -33,7 +29,7 @@ function setUpdatedGameInfo (payload) {
 }
 
 function setPawnsInfo (payload) {
-  pawns.value = payload;
+  pawnToUpdate.value = payload;
 }
 function setTeamsInfo (payload) {
   teams.value = payload;
@@ -46,34 +42,36 @@ function isInformationLoaded () {
   return game.value?.status
       && game.value?.teams?.length > 0
       && game.value?.pawns?.length > 0
-      && Object.keys(gameInformation.value).length > 0
       && game.value?.kings?.length > 0;
 }
 
-onMounted(async ()=> {
-  const {kings, pawns, teams, ...gameInformation} = await httpService.get('/games', {id:route.params.id})
-  setKingsInfo(kings)
-  setPawnsInfo(pawns)
-  setTeamsInfo(teams)
-  setUpdatedGameInfo(gameInformation)
+const imInTheGame = computed(() => {
+  return game.value?.teams?.find((team: RawTeam)=> team.user_id === userService.me)
 })
+
+onMounted(async ()=> {
+  game.value = await httpService.get('/games', {id:route.params.id})
+})
+
+async function selectTeam (teamId: number) {
+  await httpService.put('/teams', {id: teamId, user_id: userService.me || null, selected: true})
+}
 
 </script>
 
 <template>
     <h1> Top Cap duel</h1>
-    <h2 v-if="gameInformation?.status === STATUSES.STARTED">C'est à l'équipe {{ gameInformation?.active_team }} de jouer</h2>
-
-    <section v-if="gameInformation?.status !== STATUSES.STARTED && gameInformation?.game_mode !== 'local'">
+     <section v-if=" game?.game_mod === 'distant' && !imInTheGame">
         <h2>Choix de l'équipe</h2>
-        <button v-for="team in teams" :onclick="()=>selectTeam(team.name)" class="button-choice">
-            <p>{{team.name}}</p>
-            <img class="team-icon" src="/assets/avatars/nut-face.png" alt="computeur image" />
-        </button>
-    </section>
-    {{isInformationLoaded()}}
-    {{game}}
-    <GameOverview v-if="isInformationLoaded()" :game="game" :pawnToUpdate="pawns"/>
+       <articles v-for="team in game?.teams">
+         <button v-if="!team.selected"  :onclick="()=>selectTeam(team.id)" class="button-choice">
+           <p>{{team.name}}</p>
+           <img class="team-icon" src="/assets/avatars/nut-face.png" alt="computeur image" />
+         </button>
+       </articles>
+     </section>
+    <h2 v-if="game?.status === STATUSES.STARTED">C'est à l'équipe {{ game?.active_team }} de jouer</h2>
+    <GameOverview v-if="isInformationLoaded() && imInTheGame" :game="game" :pawnToUpdate/>
 
     <button :onclick="() => router.go(-1)">back</button>
 

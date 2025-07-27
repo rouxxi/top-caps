@@ -39,7 +39,8 @@ async function getById (id: string) {
                  id,
                  name,
                  selected,
-                 pawns_skin
+                 pawns_skin,
+                 user_id
             )
         `)
         .eq('id', id);

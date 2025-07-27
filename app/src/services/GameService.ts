@@ -14,6 +14,7 @@ export type RawTeam = {
     name: string;
     pawns_skin: string,
     selected: boolean;
+    user_id: string | null;
 }
 export  type RawPawn = {
     id: number;

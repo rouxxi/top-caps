@@ -2,6 +2,7 @@
 import {ThreeService} from "../services/three-service.ts";
 import {onMounted, onUpdated, useTemplateRef, watch} from "vue";
 import type {RawKing, RawPawn, RawTeam} from "../services/GameService.ts";
+import {userService} from "../services/user-servive.ts";
 
 const props = defineProps<{
   pawnToUpdate: RawPawn,
@@ -28,6 +29,7 @@ onMounted(()=> {
   console.log('props.game in mount', props.game);
   three.init(gameOverview.value)
   three.generateBattleField(props.game.grid)
+  three.setUser(userService.me);
   three.generatePawns(props.game.pawns, props.game.teams);
   three.consumeGameInformation( {
     pawns: props.game.pawns,
@@ -48,17 +50,6 @@ onUpdated( ()=> {
   if (props.pawnToUpdate) {
     three.applyPawnChangesFromDB(props.pawnToUpdate)
   }
-  // three.consumeGameInformation({
-  //   pawns: props.game.pawns,
-  //   kings: props.game.kings,
-  //   teams: props.game.teams,
-  //   gameInformation: {
-  //     active_team: props.game.active_team,
-  //     game_mod: props.game.game_mod,
-  //     grid: props.game.grid,
-  //     id: props.game.id,
-  //     status: props.game.status
-  //   } })
 })
 
 

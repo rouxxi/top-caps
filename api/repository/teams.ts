@@ -6,6 +6,7 @@ interface Team {
     selected?: boolean;
     pawns_skin: string;
     game_id: string;
+    user_id: string | null;
     created_at?: Date | null;
 }
 

@@ -3,6 +3,7 @@ import cors from 'cors';
 import bodyParser from "body-parser";
 import gameRepository from './repository/games.ts';
 import pawnsRepository from './repository/pawns.ts';
+import teamsRepository from './repository/teams.ts';
 import {createNewGame} from "./domain/usecases/createNewGame.ts";
 import {currentGame} from "./domain/usecases/currentGame.ts";
 
@@ -71,6 +72,21 @@ app.put('/pawns', async (req, res) => {
         const payload = req.body;
         if (payload) {
             const pawn = await pawnsRepository.update(payload);
+            res.status(204).send(pawn);
+        } else {
+            res.status(404).send('NotFound');
+        }
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+app.put('/teams', async (req, res) => {
+    try {
+        const payload = req.body;
+        if (payload) {
+            console.log('good place')
+            const pawn = await teamsRepository.update(payload);
             res.status(204).send(pawn);
         } else {
             res.status(404).send('NotFound');

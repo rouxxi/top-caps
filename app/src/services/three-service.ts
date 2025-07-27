@@ -27,6 +27,7 @@ export class ThreeService {
     selectedPawn?: THREE.Object3D;
     possibleMoveToString?: string[];
     eventHandler: GameEventHandler;
+    userId?: string;
 
     constructor(isPreview: boolean = false) {
         this.clickEvent = this.clickEvent.bind(this);
@@ -125,6 +126,12 @@ export class ThreeService {
 
         }
     }
+
+    setUser (userId: string | null) {
+        if (userId) {
+            this.userId = userId;
+        }
+    };
 
     consumeGameInformation ({ gameInformation , pawns, kings, teams}: { gameInformation: GameInformation , pawns: RawPawn[], kings: RawKing[], teams: RawTeam[]}) {
         let serializedTeam = []
