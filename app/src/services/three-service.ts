@@ -6,6 +6,7 @@ import type {RawKing, RawPawn, RawTeam, GameInformation} from "./GameService.ts"
 import  {GameService} from "./GameService.ts";
 import { Object3D} from "three";
 import Pawn from "../models/Pawn.ts";
+import {GameEventHandler} from "./game-event-handler.ts";
 
 type Grid = [number, number][];
 
@@ -25,6 +26,7 @@ export class ThreeService {
     game?: GameService;
     selectedPawn?: THREE.Object3D;
     possibleMoveToString?: string[];
+    eventHandler: GameEventHandler;
 
     constructor(isPreview: boolean = false) {
         this.clickEvent = this.clickEvent.bind(this);
@@ -38,6 +40,7 @@ export class ThreeService {
         this.camera = new THREE.PerspectiveCamera(50, 1.5, 0.1, 200); // Si le near est 0 => on ne voit rien
         this.mousePosition = new THREE.Vector2(0, 0);
         this.raycaster = new THREE.Raycaster();
+        this.eventHandler = new GameEventHandler();
 
         if(isPreview) {
             this.camera.position.set(0.8,1,0.8);
@@ -173,6 +176,14 @@ export class ThreeService {
 
                 if (gamePawn) {
                     gamePawn.setNewPosition([positionToMove[0], positionToMove[1]]);
+                }
+                if (gamePawn && pawnToMove) {
+                    this.eventHandler.pawnSync({
+                        id: gamePawn.id,
+                        team_id: gamePawn.teamId,
+                        position_x: gamePawn.position_x,
+                        position_y: gamePawn.position_y
+                    })
                 }
                 //TODO faire la condition pour vérifier que le pion est bien le mm que celui selectionné
                 this.selectedPawn = undefined;

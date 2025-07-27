@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from "body-parser";
 import gameRepository from './repository/games.ts';
+import pawnsRepository from './repository/pawns.ts';
 import {createNewGame} from "./domain/usecases/createNewGame.ts";
 import {currentGame} from "./domain/usecases/currentGame.ts";
 
@@ -57,6 +58,20 @@ app.put('/games', async (req, res) => {
         if (payload) {
             const game = await gameRepository.update(payload);
             res.status(204).send(game);
+        } else {
+            res.status(404).send('NotFound');
+        }
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+app.put('/pawns', async (req, res) => {
+    try {
+        const payload = req.body;
+        if (payload) {
+            const pawn = await pawnsRepository.update(payload);
+            res.status(204).send(pawn);
         } else {
             res.status(404).send('NotFound');
         }
