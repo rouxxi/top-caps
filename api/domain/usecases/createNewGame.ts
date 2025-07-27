@@ -24,7 +24,14 @@ export async function createNewGame(bodyRequest: CreateGameBody) {
 
     for (const team of bodyRequest.teams) {
         const index = bodyRequest.teams.indexOf(team);
-        const [teamCreated] = await teamsRepository.create({name: team.name, game_id: game.id, pawns_skin:team.pawns_skin})
+
+        const [teamCreated] = await teamsRepository.create({name: team.name, game_id: game.id, pawns_skin:team.pawns_skin, user_id: null})
+        if (index === 0) {
+            await gameRepository.update({
+                id: game.id,
+                active_team: teamCreated.id,
+            })
+        }
 
         await kingRepository.create({
             position_x: preset.teams[index].kingPosition[0],

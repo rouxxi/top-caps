@@ -138,10 +138,11 @@ export class ThreeService {
         for (let team of teams) {
             const teamPawns = pawns.filter((pawn)=> pawn.team_id === team.id).map((pawn)=>(new Pawn(pawn.id, pawn.position_x, pawn.position_y, team.id, team.pawns_skin)));
             const teamKing = kings.find((king)=> king.team_id === team.id);
-            serializedTeam.push({id: team.id, name: team.name, selected: team.selected, pawns_skin:team.pawns_skin , kingPosition: [teamKing.position_x, teamKing.position_y], teamPawns});
+            serializedTeam.push({id: team.id, name: team.name, selected: team.selected, pawns_skin:team.pawns_skin , kingPosition: [teamKing.position_x, teamKing.position_y], user_id:team.user_id , teamPawns});
         }
 
         this.game = new GameService({
+            id: gameInformation.id,
             status: gameInformation.status,
             game_mod: gameInformation.game_mod,
             active_team: gameInformation.active_team,
@@ -158,20 +159,46 @@ export class ThreeService {
         this.scene.rotation.set(-0.6953905063863763,-0.02340503126905997,-0.019525808419736532);
     }
 
-    clickEvent (event) {
+    get canIPlay () : boolean {
+        const team = this.game?.teams?.find((team) => team.user_id === this.userId);
+        return team?.id === this.game?.active_team;
+    }
+
+    isMyPawn (pawnId) : boolean {
+        const myTeam = this.game?.teams?.find((team) => team.user_id === this.userId);
+        const allPawns = this.scene.getObjectByName('pawns-group');
+        const myPawns = allPawns?.children.filter((element) => element.game_team_id === myTeam.id);
+        return !!myPawns?.find((pawn) => pawn.game_id === pawnId);
+    }
+
+
+    playerFinished () {
+        const teamHasPlayed = this.game?.teams?.find((team) => team.user_id === this.userId);
+        const teamToPlay = this.game?.teams.filter((team) => team.id !== teamHasPlayed.id)
+        if (teamToPlay?.length === 1) {
+           this.eventHandler.teamHasToPlay(this.game?.id,teamToPlay[0].id);
+        }
+    }
+
+    async clickEvent (event) {
+        console.log(this.canIPlay)
+        if (!this.canIPlay) return;
+
         const board = this.scene.getObjectByName('board-group');
         console.log({board});
         if (board instanceof Object3D) {
             const intersect = this.raycaster.intersectObject(board);
             const selectedTile = intersect.find((obj) => obj.object.name.includes('tile')); // je n'arrive pas a selectionner mes pawns xD
             const tilePosition = selectedTile?.object.game_position;
+            const selectedPawn = this.scene.getObjectByName( `pawn-${tilePosition}`);
+
 
             console.log(selectedTile);
             if (!this.selectedPawn && !selectedTile?.object?.is_available_move) {
-                this.selectedPawn = this.scene.getObjectByName( `pawn-${tilePosition}`);
+                if (this.isMyPawn(selectedPawn?.game_id)) return;
+                this.selectedPawn = selectedPawn;
             } else if (this.selectedPawn && selectedTile?.object?.is_available_move) {
                 const positionToMove = selectedTile.object.name.split('-')[1].split(',').map((el)=> parseInt(el));
-
                 const pawnToMove = this.scene.getObjectByName( this.selectedPawn.name);
 
                 if (pawnToMove) {
@@ -185,13 +212,14 @@ export class ThreeService {
                     gamePawn.setNewPosition([positionToMove[0], positionToMove[1]]);
                 }
                 if (gamePawn && pawnToMove) {
-                    this.eventHandler.pawnSync({
+                   this.eventHandler.pawnSync({
                         id: gamePawn.id,
                         team_id: gamePawn.teamId,
                         position_x: gamePawn.position_x,
                         position_y: gamePawn.position_y
                     })
                 }
+                this.playerFinished()
                 //TODO faire la condition pour vérifier que le pion est bien le mm que celui selectionné
                 this.selectedPawn = undefined;
             } else {
@@ -280,6 +308,7 @@ export class ThreeService {
              team?.pawns_skin,
              [pawn.position_x,pawn.position_y],
              pawn.id,
+               team.id,
                // this.scene
                 pawnsGroup
             );
@@ -359,7 +388,7 @@ export class ThreeService {
         return texture;
     }
 
-    loadPawn (name: string, position: [number, number], id, group) {
+    loadPawn (name: string, position: [number, number], pawnId,teamId, group) {
         if (!name) return;
         const config = gltfImportFormat.getConfigByName(name);
         if (!config) return;
@@ -371,7 +400,8 @@ export class ThreeService {
                 gltf.scene.rotateX(config.game.rotation.x)
                 gltf.scene.scale.set(config.game.scale.x,config.game.scale.y,config.game.scale.z);
 
-                gltf.scene.game_id = id;
+                gltf.scene.game_id = pawnId;
+                gltf.scene.game_team_id = teamId;
                 gltf.scene.game_position = position.join(',');
                 gltf.scene.name = `pawn-${position.join(',')}`
                 group.add(gltf.scene)

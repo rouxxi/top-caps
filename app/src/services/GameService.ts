@@ -46,13 +46,15 @@ export const STATUSES = {
 }
 
 export class GameService {
+    id: string;
     status?: string;
     game_mod?: string;
     active_team?: number;
     grid: [number, number][] = [];
     teams: Team[] = [];
 
-    constructor({status,game_mod,active_team, grid, teams }: {status: string,game_mod: string,active_team: number, grid: [number,number][], teams: Team[] }) {
+    constructor({id, status,game_mod,active_team, grid, teams }: {id:string, status: string,game_mod: string,active_team: number, grid: [number,number][], teams: Team[] }) {
+        this.id = id;
         this.status = status;
         this.game_mod = game_mod;
         this.active_team = active_team;

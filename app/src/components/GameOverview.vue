@@ -48,7 +48,6 @@ onUpdated( ()=> {
   if (props.pawnToUpdate) {
     three.applyPawnChangesFromDB(props.pawnToUpdate)
   }
-
   three.consumeGameInformation( {
     pawns: props.game.pawns,
     kings: props.game.kings,
@@ -60,6 +59,7 @@ onUpdated( ()=> {
       id: props.game.id,
       status: props.game.status
     } })
+  three.setUser(userService.me); // Peut être too much xD
 })
 
 
