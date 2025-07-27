@@ -46,7 +46,7 @@ onUpdated( ()=> {
   console.log('trigger updated')
   console.log('props.pawnToUpdate', props.pawnToUpdate)
   if (props.pawnToUpdate) {
-    three.applyPawnChanges(props.pawnToUpdate)
+    three.applyPawnChangesFromDB(props.pawnToUpdate)
   }
   // three.consumeGameInformation({
   //   pawns: props.game.pawns,

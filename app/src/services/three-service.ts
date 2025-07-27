@@ -104,7 +104,7 @@ export class ThreeService {
         this.mousePosition.setY(- ( y / canvas.scrollHeight ) * 2 + 1);
     }
 
-    applyPawnChanges (pawn) {
+    applyPawnChangesFromDB (pawn) {
         console.log("applyPawnChanges")
         console.log(this.scene)
         const objects3D = this.scene.getObjectsByProperty( 'game_id', pawn.id);
