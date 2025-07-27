@@ -45,11 +45,21 @@ onMounted(()=> {
 })
 
 onUpdated( ()=> {
-  console.log('trigger updated')
-  console.log('props.pawnToUpdate', props.pawnToUpdate)
   if (props.pawnToUpdate) {
     three.applyPawnChangesFromDB(props.pawnToUpdate)
   }
+
+  three.consumeGameInformation( {
+    pawns: props.game.pawns,
+    kings: props.game.kings,
+    teams: props.game.teams,
+    gameInformation: {
+      active_team: props.game.active_team,
+      game_mod: props.game.game_mod,
+      grid: props.game.grid,
+      id: props.game.id,
+      status: props.game.status
+    } })
 })
 
 
