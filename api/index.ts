@@ -10,9 +10,7 @@ import {currentGame} from "./domain/usecases/currentGame.ts";
 const app = express();
 const port = 4200
 
-app.use(cors({
-    origin: '*',
-}))
+app.use(cors())
 app.use(bodyParser.json());
 
 app.get('/games', async (req, res) => {
@@ -85,7 +83,6 @@ app.put('/teams', async (req, res) => {
     try {
         const payload = req.body;
         if (payload) {
-            console.log('good place')
             const pawn = await teamsRepository.update(payload);
             res.status(204).send(pawn);
         } else {

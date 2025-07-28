@@ -108,7 +108,7 @@ function getConfigByName (name :  string) : ConfigElement {
         throw new Error(`Cannot find config for ${name} in /config/gltf-files-format.ts`)
     }
 
-    const [ , value ] = Object.entries(gltfConfig).find(([keyName, value]) => name === keyName )
+    const [ _, value ] = Object.entries(gltfConfig).find(([keyName, _]) => name === keyName )
 
     return value;
 }

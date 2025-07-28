@@ -7,6 +7,7 @@ export type Team = {
     pawns_skin: string;
     kingPosition: [number, number];
     teamPawns: Pawn[];
+    user_id: string | null
 };
 
 export type RawTeam = {
@@ -49,7 +50,7 @@ export class GameService {
     id: string;
     status?: string;
     game_mod?: string;
-    active_team?: number;
+    active_team?: number | null;
     grid: [number, number][] = [];
     teams: Team[] = [];
 

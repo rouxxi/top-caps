@@ -87,7 +87,6 @@ export class ThreeService {
                 // this._setDefaufaultCameraPosition();
 
                 this._setDefaufaultCameraPosition()
-                // console.log(this.game?.isGameFinished)
                 this.raycaster.setFromCamera( this.mousePosition, this.camera );
                 this.renderer?.render( this.scene, this.camera );
 
@@ -108,12 +107,10 @@ export class ThreeService {
         this.mousePosition.setY(- ( y / canvas.scrollHeight ) * 2 + 1);
     }
 
-    applyPawnChangesFromDB (pawn) {
-        console.log("applyPawnChanges")
-        console.log(this.scene)
+    applyPawnChangesFromDB (pawn:RawPawn) {
         const objects3D = this.scene.getObjectsByProperty( 'game_id', pawn.id);
         const pawnToMove = objects3D.find( object => object.name.includes('pawn'))
-        console.log({pawnToMove})
+
         if (pawnToMove) {
             pawnToMove?.position.setX(pawn.position_x +1);
             pawnToMove?.position.setZ(pawn.position_y +1);
@@ -121,7 +118,7 @@ export class ThreeService {
             const gamePawn = this.game?.findPawn(pawn?.id)
 
             if (gamePawn) {
-                gamePawn.setNewPosition([pawn[0], pawn[1]]);
+                gamePawn.setNewPosition([pawn.position_x, pawn.position_y]);
             }
 
         }
@@ -138,7 +135,7 @@ export class ThreeService {
         for (let team of teams) {
             const teamPawns = pawns.filter((pawn)=> pawn.team_id === team.id).map((pawn)=>(new Pawn(pawn.id, pawn.position_x, pawn.position_y, team.id, team.pawns_skin)));
             const teamKing = kings.find((king)=> king.team_id === team.id);
-            serializedTeam.push({id: team.id, name: team.name, selected: team.selected, pawns_skin:team.pawns_skin , kingPosition: [teamKing.position_x, teamKing.position_y], user_id:team.user_id , teamPawns});
+            serializedTeam.push({id: team.id, name: team.name, selected: team.selected, pawns_skin:team.pawns_skin , kingPosition: [teamKing?.position_x, teamKing?.position_y], user_id:team.user_id , teamPawns});
         }
 
         this.game = new GameService({
@@ -160,7 +157,9 @@ export class ThreeService {
     }
 
     get canIPlay () : boolean {
+        console.log('canIplay')
         const team = this.game?.teams?.find((team) => team.user_id === this.userId);
+        console.log(team?.id === this.game?.active_team);
         return team?.id === this.game?.active_team;
     }
 
@@ -180,20 +179,18 @@ export class ThreeService {
         }
     }
 
-    async clickEvent (event) {
-        console.log(this.canIPlay)
+    async clickEvent (_) {
+        console.log(this.game)
         if (!this.canIPlay) return;
 
         const board = this.scene.getObjectByName('board-group');
-        console.log({board});
         if (board instanceof Object3D) {
             const intersect = this.raycaster.intersectObject(board);
-            const selectedTile = intersect.find((obj) => obj.object.name.includes('tile')); // je n'arrive pas a selectionner mes pawns xD
+            const selectedTile = intersect.find((obj) => obj.object.name.includes('tile'));
             const tilePosition = selectedTile?.object.game_position;
             const selectedPawn = this.scene.getObjectByName( `pawn-${tilePosition}`);
 
 
-            console.log(selectedTile);
             if (!this.selectedPawn && !selectedTile?.object?.is_available_move) {
                 if (this.isMyPawn(selectedPawn?.game_id)) return;
                 this.selectedPawn = selectedPawn;
@@ -296,7 +293,6 @@ export class ThreeService {
     }
 
     generatePawns (pawnArray: RawPawn[], teams: RawTeam[] = []) {
-        console.log('geneatePawns')
         const pawnsGroup = new THREE.Group();
         pawnsGroup.position.set(0,0,0);
 
@@ -309,14 +305,9 @@ export class ThreeService {
              [pawn.position_x,pawn.position_y],
              pawn.id,
                team.id,
-               // this.scene
                 pawnsGroup
             );
-           console.log(this.scene)
-           // this.scene.add(generatedPawn)
         }
-
-        // this.scene.add(pawnsGroup);
     }
 
     _createTile (position: [number,number])  {
@@ -388,7 +379,7 @@ export class ThreeService {
         return texture;
     }
 
-    loadPawn (name: string, position: [number, number], pawnId,teamId, group) {
+    loadPawn (name: string, position: [number, number], pawnId: number,teamId: number, group) {
         if (!name) return;
         const config = gltfImportFormat.getConfigByName(name);
         if (!config) return;
@@ -406,8 +397,7 @@ export class ThreeService {
                 gltf.scene.name = `pawn-${position.join(',')}`
                 group.add(gltf.scene)
             },
-            (prog) => {
-                // console.log({prog })
+            () => {
             },
             (err) => {
                 console.log({err})

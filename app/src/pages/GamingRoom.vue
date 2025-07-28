@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useRoute, useRouter} from 'vue-router';
 import {computed, onMounted, ref, watch} from 'vue';
-import { RawTeam, STATUSES} from '../services/GameService.ts';
+import {type GameInformation, type RawPawn, type RawTeam, STATUSES} from '../services/GameService.ts';
 import GameOverview from '../components/GameOverview.vue';
 import {httpService} from "../services/http-service.ts";
 import {Subscritpions} from "../services/subscritpions.ts";
@@ -9,10 +9,10 @@ import {userService} from "../services/user-servive.ts";
 
 const route = useRoute();
 const router = useRouter();
-const teams = ref([]);
-const kings = ref([]);
+const teams = ref();
+const kings = ref();
 const pawnToUpdate = ref();
-const gameInformation = ref({});
+const gameInformation = ref();
 
 Subscritpions.subGame(route.params.id, setUpdatedGameInfo);
 Subscritpions.subTeams(route.params.id, setTeamsInfo );
@@ -20,23 +20,24 @@ Subscritpions.subPawns(route.params.id, setPawnsInfo );
 
 const game = ref();
 
-watch([teams,kings, pawnToUpdate, gameInformation ],  async (payload)=> {
+watch([teams,kings, pawnToUpdate, gameInformation ],  async ()=> {
   game.value = await httpService.get('/games', {id: route.params.id});
 })
 
-function setUpdatedGameInfo (payload) {
+function setUpdatedGameInfo (payload:GameInformation | unknown) {
   gameInformation.value = payload;
 }
 
-function setPawnsInfo (payload) {
+function setPawnsInfo (payload: RawPawn | unknown) {
   pawnToUpdate.value = payload;
 }
-function setTeamsInfo (payload) {
+function setTeamsInfo (payload: RawTeam | unknown) {
   teams.value = payload;
 }
-function setKingsInfo (payload) {
-  kings.value = payload;
-}
+
+// function setKingsInfo (payload: RawKing) {
+//   kings.value = payload;
+// }
 
 function isInformationLoaded () {
   return game.value?.status
