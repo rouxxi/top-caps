@@ -1,11 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from "body-parser";
-import gameRepository from './repository/games.ts';
-import pawnsRepository from './repository/pawns.ts';
-import teamsRepository from './repository/teams.ts';
-import {createNewGame} from "./domain/usecases/createNewGame.ts";
-import {currentGame} from "./domain/usecases/currentGame.ts";
+// import express = require("express")
+// import cors = require("cors")
+// import bodyParser = require("body-parser")
+import * as gameRepository from "./src/repository/games.ts";
+import * as pawnsRepository from './src/repository/pawns.ts';
+import * as teamsRepository from './src/repository/teams.ts';
+import {createNewGame} from "./src/domain/usecases/createNewGame.ts";
+import {currentGame} from "./src/domain/usecases/currentGame.ts";
 
 const app = express();
 const port = 4200
@@ -15,11 +18,12 @@ app.use(bodyParser.json());
 
 app.get('/games', async (req, res) => {
     try {
-        const id = req.query.id
+        const { id } = req.query
         if (!id) {
             res.status(400).send("No ID sended")
             return;
         }
+        // @ts-ignore
         const data = await currentGame(id);
         if (!data) {
             res.status(404).send('Not found')

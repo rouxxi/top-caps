@@ -1,0 +1,14 @@
+services:
+  api:
+    working_dir: /home/api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file: "./api/.env"
+    ports:
+      - "4201:4200"
+    volumes:
+      - ./api/src:/home/api/src
+      - ./api/package.json:/home/api/package.json
+      - ./api/index.ts:/home/api/index.ts
+    command: ['npm','start']

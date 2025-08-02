@@ -72,4 +72,4 @@ async function deleteFromId (id: number ) {
     return data;
 }
 
-export default { getById, update, create, deleteFromId }
+export { getById, update, create, deleteFromId }

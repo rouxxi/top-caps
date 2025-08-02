@@ -129,4 +129,4 @@ async function get (id: string) {
     return data;
 }
 
-export default { getById, update, create, deleteFromId }
+export  { getById, update, create, deleteFromId }
