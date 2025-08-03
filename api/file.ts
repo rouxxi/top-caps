@@ -1,1 +1,0 @@
-{} //during build tsConfig need a .ts in the docker image for works

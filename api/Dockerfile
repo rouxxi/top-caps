@@ -4,7 +4,7 @@ WORKDIR /home/api/
 
 COPY package*.json .
 COPY tsconfig.json .
-COPY file.ts .
+COPY config.ts .
 
 RUN npm install
 RUN npm run build
