@@ -24,4 +24,4 @@ class HttpService {
 
 
 
-export const httpService = new HttpService('http://localhost:4200');
+export const httpService = new HttpService(import.meta.env.VITE_API_URL || 'http://localhost:4201');
