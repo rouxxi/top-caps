@@ -9,7 +9,6 @@ lerna-debug.log*
 
 node_modules
 app/dist
-api/database/database.json
 dist-ssr
 *.local
 
