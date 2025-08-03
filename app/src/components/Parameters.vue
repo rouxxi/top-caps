@@ -83,7 +83,8 @@ function selectLocalMod (event:Event) {
                 <label for="pawn-skin-player-1">Pion</label>
                 
                 <select id="pawn-skin-player-1" @change="selectSkinPawnPlayer1">
-                    <option v-for="name in pawnsConfigName" :value="name" :key="name"> {{name}} </option>
+                    <option :value="pawnsConfigName[0]" :key="pawnsConfigName[0]"> {{pawnsConfigName[0]}} </option>
+<!--                    <option v-for="name in pawnsConfigName" :value="name" :key="name"> {{name}} </option>-->
                 </select>
                 <PawnPreview player="player-1" :pawnSkinName="pawnSkinNamePlayer1" />
             </articles>
@@ -96,7 +97,8 @@ function selectLocalMod (event:Event) {
                 <label for="pawn-skin-player-1">Pion</label>
                 
                 <select id="pawn-skin-player-1" @change="selectSkinPawnPlayer2">
-                    <option v-for="name in pawnsConfigName" :value="name" :key="name"> {{name}} </option>
+                    <option :value="pawnsConfigName[1]" :key="pawnsConfigName[1]"> {{pawnsConfigName[1]}} </option>
+<!--                    <option v-for="name in pawnsConfigName" :value="name" :key="name"> {{name}} </option>-->
                 </select>
                 <PawnPreview player="player-2" :pawnSkinName="pawnSkinNamePlayer2" />
             </articles>
