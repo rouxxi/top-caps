@@ -11,4 +11,3 @@ services:
       - ./api/src:/home/api/src
       - ./api/package.json:/home/api/package.json
       - ./api/index.ts:/home/api/index.ts
-    command: ['npm','start']
