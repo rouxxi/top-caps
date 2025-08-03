@@ -38,6 +38,11 @@ function setTeamsInfo (payload: RawTeam | unknown) {
 // function setKingsInfo (payload: RawKing) {
 //   kings.value = payload;
 // }
+const activeTeam = computed(() => {
+  const activeTeamId = game?.value?.active_team;
+  const team = game?.value?.teams?.find((team) => team.id === activeTeamId)
+  return team;
+})
 
 function isInformationLoaded () {
   return game.value?.status
@@ -72,7 +77,12 @@ async function selectTeam (teamId: number) {
        </articles>
      </section>
     <h2 v-if="game?.status === STATUSES.STARTED">C'est à l'équipe {{ game?.active_team }} de jouer</h2>
-    <GameOverview v-if="isInformationLoaded() && imInTheGame" :game="game" :pawnToUpdate/>
+  <section >
+    <h2>
+      {{ `C'est à ${activeTeam?.name} de jouer` }}
+    </h2>
+  </section>
+    <GameOverview v-if="(isInformationLoaded() && imInTheGame && game?.game_mod=== 'distant') || (game?.game_mod=== 'local' && isInformationLoaded())" :game="game" :pawnToUpdate/>
 
     <button :onclick="() => router.go(-1)">back</button>
 

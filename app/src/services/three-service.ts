@@ -157,6 +157,7 @@ export class ThreeService {
     }
 
     get canIPlay () : boolean {
+        if (this.game?.game_mod === "local") return true;
         console.log('canIplay')
         const team = this.game?.teams?.find((team) => team.user_id === this.userId);
         console.log(team?.id === this.game?.active_team);
@@ -164,7 +165,10 @@ export class ThreeService {
     }
 
     isMyPawn (pawnId) : boolean {
-        const myTeam = this.game?.teams?.find((team) => team.user_id === this.userId);
+        const myTeam = this.game?.teams?.find((team) => {
+            if (this.game?.game_mod === "local") return team.id === this.game?.active_team;
+            return team.user_id === this.userId
+        });
         const allPawns = this.scene.getObjectByName('pawns-group');
         const myPawns = allPawns?.children.filter((element) => element.game_team_id === myTeam.id);
         return !!myPawns?.find((pawn) => pawn.game_id === pawnId);
@@ -172,7 +176,10 @@ export class ThreeService {
 
 
     playerFinished () {
-        const teamHasPlayed = this.game?.teams?.find((team) => team.user_id === this.userId);
+        const teamHasPlayed = this.game?.teams?.find((team) => {
+            if (this.game?.game_mod === "local") return team.id === this.game?.active_team;
+            return team.user_id === this.userId
+        });
         const teamToPlay = this.game?.teams.filter((team) => team.id !== teamHasPlayed.id)
         if (teamToPlay?.length === 1) {
            this.eventHandler.teamHasToPlay(this.game?.id,teamToPlay[0].id);
