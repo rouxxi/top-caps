@@ -1,9 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from "body-parser";
-// import express = require("express")
-// import cors = require("cors")
-// import bodyParser = require("body-parser")
 import * as gameRepository from "./src/repository/games.ts";
 import * as pawnsRepository from './src/repository/pawns.ts';
 import * as teamsRepository from './src/repository/teams.ts';
@@ -12,7 +9,7 @@ import {currentGame} from "./src/domain/usecases/currentGame.ts";
 import ENV from './config.ts';
 
 const app = express();
-const port = ENV.PORT;
+const port = ENV.API_PORT;
 
 app.use(cors())
 app.use(bodyParser.json());
