@@ -9,9 +9,10 @@ import * as pawnsRepository from './src/repository/pawns.ts';
 import * as teamsRepository from './src/repository/teams.ts';
 import {createNewGame} from "./src/domain/usecases/createNewGame.ts";
 import {currentGame} from "./src/domain/usecases/currentGame.ts";
+import ENV from './config.ts';
 
 const app = express();
-const port = 4200
+const port = ENV.PORT;
 
 app.use(cors())
 app.use(bodyParser.json());
