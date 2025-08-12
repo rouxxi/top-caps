@@ -5,8 +5,8 @@ import GamingRoom from './pages/GamingRoom.vue';
 import NotFound from './pages/NotFound.vue';
 
 const routes = [
+    { path: '/',name: '/', redirect: HomePage , component: HomePage },
     { path: '/gaming-room/:id', name: '/gaming-room', component: GamingRoom },
-    { path: '/',name: '/', component: HomePage },
     {
         path: "/:catchAll(.*)",
         name: "NotFound",
