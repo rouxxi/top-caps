@@ -3,7 +3,7 @@ import {useRoute, useRouter} from 'vue-router';
 import {computed, onMounted, ref, watch} from 'vue';
 import {type GameInformation, type RawPawn, type RawTeam, STATUSES} from '../services/GameService.ts';
 import GameOverview from '../components/GameOverview.vue';
-import {httpService} from "../services/http-service.ts";
+import {RequestService} from "../services/request-service.ts";
 import {Subscritpions} from "../services/subscritpions.ts";
 import {userService} from "../services/user-servive.ts";
 
@@ -21,7 +21,7 @@ Subscritpions.subPawns(route.params.id, setPawnsInfo );
 const game = ref();
 
 watch([teams,kings, pawnToUpdate, gameInformation ],  async ()=> {
-  game.value = await httpService.get('/games', {id: route.params.id});
+  game.value = await RequestService.get('/games', {id: route.params.id});
 })
 
 function setUpdatedGameInfo (payload:GameInformation | unknown) {
@@ -56,11 +56,11 @@ const imInTheGame = computed(() => {
 })
 
 onMounted(async ()=> {
-  game.value = await httpService.get('/games', {id:route.params.id})
+  game.value = await RequestService.get('/games', {id:route.params.id})
 })
 
 async function selectTeam (teamId: number) {
-  await httpService.put('/teams', {id: teamId, user_id: userService.me || null, selected: true})
+  await RequestService.put('/teams', {id: teamId, user_id: userService.me || null, selected: true})
 }
 
 </script>

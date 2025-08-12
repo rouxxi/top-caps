@@ -1,6 +1,6 @@
 import { createStore } from 'vuex';
 import { STATUSES } from './services/GameService.ts';
-import { httpService } from './services/http-service.ts';
+import { RequestService } from './services/request-service.ts';
 
 export const store = createStore({
     state: {
@@ -43,11 +43,11 @@ export const store = createStore({
     actions: {
         selectMod: async ( {commit, state} , paylod)  => {
             commit('selectMod',{...paylod, status: STATUSES.MOD_SELECTED});
-            await httpService.put('/games', {...paylod, status: STATUSES.MOD_SELECTED});
+            await RequestService.put('/games', {...paylod, status: STATUSES.MOD_SELECTED});
         },
         createGame: async ( {commit, state} , payload)  => {
             try {
-               const gameId =  await httpService.post('/games', payload)
+               const gameId =  await RequestService.post('/games', payload)
                return gameId;
             } catch (err) {
                 console.log(err)
@@ -71,7 +71,7 @@ export const store = createStore({
 
             if(numberTeamSelected === state.currentGame.teams.length) {
                 commit('updateStatus', STATUSES.TEAM_SELECTED);
-                await httpService.put('/games', {id:payload, status: STATUSES.TEAM_SELECTED})
+                await RequestService.put('/games', {id:payload, status: STATUSES.TEAM_SELECTED})
             }
         },
         
