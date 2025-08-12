@@ -1,5 +1,5 @@
 import {createClient} from "@supabase/supabase-js";
-import ENV from '../../config.ts';
+import { ENV } from '../../config.ts';
 
 export class DatabaseService {
     static async connect() {

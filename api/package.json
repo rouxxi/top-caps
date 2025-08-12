@@ -24,8 +24,9 @@
     "@types/node": "^22.15.3",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
-    "ts-node": "^10.9.2",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "ts-node": "^10.9.2",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
